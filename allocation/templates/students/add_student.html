@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Student</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .back-link:hover { text-decoration: underline; }
+        
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        button, a {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-submit {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background-color: #229954;
+        }
+        
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+            display: block;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .error-list {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .error-list li {
+            list-style-position: inside;
+        }
+        
+        .form-help {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>➕ Add New Student</h1>
+    </div>
+    
+    <div class="container">
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+        <a href="{% url 'student_list' %}" class="back-link">← Back to Student List</a>
+        
+        <div class="form-container">
+            {% if form.non_field_errors %}
+            <div class="error-list">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                
+                
+                <div class="form-group">
+                    <label>{{ form.enrollment_no.label }}</label>
+                    {{ form.enrollment_no }}
+                    {% if form.enrollment_no.errors %}
+                    <div class="form-help" style="color: #c33;">{{ form.enrollment_no.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="form-help" style="color: #c33;">{{ form.name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ form.branch.label }}</label>
+                    {{ form.branch }}
+                    {% if form.branch.errors %}
+                    <div class="form-help" style="color: #c33;">{{ form.branch.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ form.semester.label }}</label>
+                    {{ form.semester }}
+                    {% if form.semester.errors %}
+                    <div class="form-help" style="color: #c33;">{{ form.semester.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>{{ form.division.label }}</label>
+                    {{ form.division }}
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ form.email.label }}</label>
+                    {{ form.email }}
+                    <div class="form-help">Optional</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    <div class="form-help">Optional - 10 digits</div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-submit">✓ Add Student</button>
+                    <a href="{% url 'student_list' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

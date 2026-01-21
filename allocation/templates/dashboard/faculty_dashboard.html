@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Dashboard</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --sidebar: #1f2937;
+            --sidebar-accent: #111827;
+            --primary: #667eea;
+            --primary-2: #5568d3;
+            --text: #1f2937;
+            --surface-accent: #eef2ff;
+        }
+        body { margin:0; font-family: Arial, sans-serif; background: var(--bg); }
+        .layout { display:flex; min-height:100vh; }
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            color: white;
+            padding: 20px 18px;
+            display:flex; flex-direction:column;
+        }
+        .brand { font-weight: 700; font-size: 18px; margin-bottom: 16px; }
+        .profile {
+            background: var(--sidebar-accent);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        .profile .name { font-weight: 700; }
+        .profile .role { font-size: 13px; color: #cbd5e1; }
+        .nav { list-style: none; padding:0; margin:0; }
+        .nav li { margin-bottom: 8px; }
+        .nav a {
+            display:block;
+            padding: 10px 12px;
+            border-radius:6px;
+            color: white;
+            text-decoration:none;
+            background: transparent;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .nav a:hover { background: rgba(255,255,255,0.08); }
+        .nav .primary { background: var(--primary); }
+        .nav .primary:hover { background: var(--primary-2); }
+        .content { flex:1; padding: 28px; }
+        h1 { margin:0 0 8px 0; color: var(--text); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 16px 0; }
+        .card { background: white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-top:16px; }
+        .subject-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+        .subject-card { background:#f8f9fa; border-radius:8px; padding:14px; border-left: 4px solid var(--primary); }
+        .subject-code { font-weight:700; color: #111827; }
+        .subject-name { color:#4b5563; font-size:13px; margin-bottom:10px; }
+        .actions { display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 4px 0; }
+        .btn { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; text-decoration:none; }
+        .btn:hover { background: var(--primary-2); }
+        .note { background: var(--surface-accent); border-left:4px solid var(--primary); padding:12px; border-radius:6px; margin-bottom:16px; color: var(--text); }
+        @media (max-width: 900px) { .layout { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap:10px; } .nav { display:flex; flex-wrap: wrap; gap:6px; } .nav li { margin:0; } .content { padding: 18px; } }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">📚 Faculty</div>
+            <div class="profile">
+                <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="role">Faculty</div>
+                <div class="role">{{ request.user.email }}</div>
+            </div>
+            <ul class="nav">
+                <li><a href="{% url 'dashboard' %}" class="primary">Dashboard</a></li>
+                <li><a href="{% url 'mark_attendance' %}">Mark Attendance</a></li>
+                <li><a href="{% url 'student_list' %}">Students</a></li>
+                <li><a href="{% url 'allocate' %}">Exam Seating</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Faculty Dashboard</h1>
+
+            {% if last_subject %}
+            <div class="note">✓ Last accessed: <strong>{{ last_subject.code }}</strong> ({{ last_subject.name }})</div>
+            {% endif %}
+
+            {% if pending_attendance %}
+            <div class="grid">
+                {% for subject_id, message in pending_attendance.items %}
+                <div class="card" style="border-left:4px solid var(--primary); background: var(--surface-accent); color: var(--text);">
+                    ⚠️ Attendance Pending
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="panel">
+                <div class="actions">
+                    <a href="{% url 'mark_attendance' %}" class="btn">🗓 Mark Attendance</a>
+                    <a href="{% url 'student_list' %}" class="btn">👥 View Students</a>
+                    <a href="{% url 'allocate' %}" class="btn">🎫 Exam Seating</a>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>📖 Your Subjects</h2>
+                {% if subjects %}
+                <div class="subject-grid">
+                    {% for subject in subjects %}
+                    <div class="subject-card">
+                        <div class="subject-code">{{ subject.code }}</div>
+                        <div class="subject-name">{{ subject.name }}</div>
+                        <div class="actions">
+                            <a href="{% url 'mark_attendance' %}?subject={{ subject.id }}" class="btn">Mark Attendance</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p style="color: #7f8c8d;">No subjects assigned</p>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

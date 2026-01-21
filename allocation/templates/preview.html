@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .header {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .title-row > div {
+            flex: 1;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+
+        .meta {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .note {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        @media print {
+            button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+{% include 'partials/back_to_dashboard.html' %}
+
+<div class="center header">
+    KADI SARVA VISHWAVIDYALAYA<br>
+    LDRP Institute of Technology and Research
+</div>
+
+<div class="title-row">
+    <div>Semester: {{ semester }}</div>
+    <div>Seating Arrangement</div>
+    <div>{{ month }} {{ year }}</div>
+</div>
+
+<div class="meta">
+    Date: {{ date_from }} to {{ date_to }}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Branch</th>
+            <th>Block No</th>
+            <th>Room No</th>
+            <th colspan="2">Seat Nos</th>
+            <th>No. of Students</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>From</th>
+            <th>To</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in seating %}
+    <tr>
+        {% if forloop.first %}
+        <td rowspan="{{ seating|length }}">CE</td>
+        {% endif %}
+        <td>{{ forloop.counter }}</td>
+        <td>{{ r.room_no }}</td>
+        <td>{{ r.seat_from }}</td>
+        <td>{{ r.seat_to }}</td>
+        <td>{{ r.count }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if note %}
+<div class="note">
+    * {{ note }}
+</div>
+{% endif %}
+
+<div class="footer">
+    Prepared by Exam Section
+</div>
+
+<div class="button-container">
+    <button onclick="window.print()">Print / Save as PDF</button>
+    <a href="/download/?semester={{ semester }}&month={{ month }}&year={{ year }}&date_from={{ date_from }}&date_to={{ date_to }}&note={{ note }}">
+        <button type="button">Download PDF</button>
+    </a>
+    <a href="/students/?semester={{ semester }}&month={{ month }}&year={{ year }}">
+        <button type="button">View Student List</button>
+    </a>
+</div>
+
+</body>
+</html>

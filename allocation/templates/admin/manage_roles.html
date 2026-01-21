@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin: Manage Roles</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h1 { margin-bottom: 8px; }
+        .note { color: #555; margin-bottom: 20px; }
+        .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-bottom:16px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .card { border:1px solid #ddd; border-radius:8px; padding:16px; }
+        label { display:block; margin-top:10px; font-weight:bold; }
+        select, input[type=text] { width:100%; padding:8px; margin-top:6px; }
+        .subjects { height: 140px; }
+        button { margin-top:14px; padding:10px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; }
+        button:hover { background:#5568d3; }
+        ul { list-style: none; padding-left: 0; }
+        li { padding: 6px 0; border-bottom: 1px dashed #eee; }
+    </style>
+</head>
+<body>
+    <h1>Admin: Manage Roles</h1>
+  {% include 'partials/back_to_dashboard.html' %}
+    <p class="note">Assign faculty roles to users and quickly seed a demo faculty account for testing.</p>
+
+    {% if message %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <div class="grid">
+        <div class="card">
+            <h2>Assign Faculty Role</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="assign">
+
+                <label>User without faculty</label>
+                <select name="user_id" required>
+                    {% for u in users_without_faculty %}
+                      <option value="{{ u.id }}">{{ u.username }} ({{ u.email }})</option>
+                    {% empty %}
+                      <option value="" disabled>No users available</option>
+                    {% endfor %}
+                </select>
+
+                <label>Employee ID</label>
+                <input type="text" name="employee_id" placeholder="e.g., EMP0012">
+
+                <label>Assign Subjects (hold Ctrl to multi-select)</label>
+                <select name="subjects" multiple class="subjects">
+                    {% for s in subjects %}
+                      <option value="{{ s.id }}">{{ s.code }} - {{ s.name }}</option>
+                    {% empty %}
+                      <option value="" disabled>No subjects defined</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Assign Faculty</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Seed Demo Faculty</h2>
+            <p>Creates user <b>faculty1</b> / <b>faculty123</b> and links a Faculty profile (assigns the first subject if available).</p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="seed_demo">
+                <button type="submit">Create Demo Faculty</button>
+            </form>
+
+            <h3 style="margin-top:20px;">Users without Faculty</h3>
+            <ul>
+                {% for u in users_without_faculty %}
+                  <li>{{ u.username }} ({{ u.email }})</li>
+                {% empty %}
+                  <li>All users have faculty profiles.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

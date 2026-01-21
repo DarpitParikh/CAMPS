@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mark Attendance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .back-link:hover { text-decoration: underline; }
+        
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label span {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        
+        .btn-load {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-load:hover { background-color: #2980b9; }
+        
+        .students-section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .students-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .student-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .student-item {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #ecf0f1;
+        }
+        
+        .student-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .student-detail {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .attendance-toggle {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .attendance-toggle button {
+            padding: 6px 12px;
+            border: 1px solid #bdc3c7;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .attendance-toggle button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .btn-save {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .btn-save:hover { background-color: #229954; }
+        
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group { grid-template-columns: 1fr; }
+            .student-item { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Mark Attendance</h1>
+    </div>
+    
+    <div class="container">
+        {% include 'partials/back_to_dashboard.html' %}
+        
+        <!-- Filters -->
+        <div class="filter-section">
+            <form method="get">
+                <div class="form-group">
+                    <label>
+                        <span>Subject</span>
+                        <select name="subject" id="subject" required>
+                            <option value="">Select Subject...</option>
+                            {% for subj in form.subject.field.queryset %}
+                            <option value="{{ subj.id }}" {% if request.GET.subject|add:"" == subj.id|add:"" %}selected{% endif %}>
+                                {{ subj.code }} - {{ subj.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>Division</span>
+                        <select name="division" id="division">
+                            <option value="">All Divisions</option>
+                            <option value="A" {% if request.GET.division == 'A' %}selected{% endif %}>A</option>
+                            <option value="B" {% if request.GET.division == 'B' %}selected{% endif %}>B</option>
+                            <option value="C" {% if request.GET.division == 'C' %}selected{% endif %}>C</option>
+                            <option value="D" {% if request.GET.division == 'D' %}selected{% endif %}>D</option>
+                            <option value="E" {% if request.GET.division == 'E' %}selected{% endif %}>E</option>
+                            <option value="F" {% if request.GET.division == 'F' %}selected{% endif %}>F</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Date</span>
+                        <input type="date" name="date" value="{{ request.GET.date }}" required>
+                    </label>
+                </div>
+                <button type="submit" class="btn-load">Load Students</button>
+            </form>
+        </div>
+        
+        <!-- Students List -->
+        {% if students %}
+        <div class="students-section">
+            <h2>📚 {{ students|length }} Students{% if request.GET.division %} - Division {{ request.GET.division }}{% endif %} - Default: Present (Click to mark Absent)</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="subject" value="{{ request.GET.subject }}">
+                <input type="hidden" name="date" value="{{ request.GET.date }}">
+                <input type="hidden" name="division" value="{{ request.GET.division }}">
+                <div class="student-list">
+                    {% for student in students %}
+                    <div class="student-item">
+                        <div>
+                            <div class="student-name">{{ student.enrollment_no }} - {{ student.name }}{% if student.division %} (Div: {{ student.division }}){% endif %}</div>
+                            <div class="student-detail">{{ student.enrollment_no }}{% if student.division %} • Division {{ student.division }}{% endif %}</div>
+                        </div>
+                        <div class="attendance-toggle">
+                            <button type="button" class="attendance-btn present-btn active" data-status="P">P</button>
+                            <button type="button" class="attendance-btn absent-btn" data-status="A">A</button>
+                            <input type="hidden" name="student_{{ student.id }}" id="att_{{ student.id }}" value="P">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="submit" class="btn-save">💾 Save Attendance</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const list = document.querySelector('.student-list');
+            if (!list) return;
+            list.querySelectorAll('.student-item').forEach(item => {
+                const roll = item.querySelector('.student-name');
+                const idMatch = (roll && roll.textContent.match(/^(\d+)/)) ? roll.textContent.match(/^(\d+)/)[1] : null;
+                const studentId = idMatch || item.querySelector('input[type="hidden"]').name.replace('student_', '');
+                item.querySelectorAll('.attendance-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const status = btn.dataset.status;
+                        const hidden = document.getElementById('att_' + studentId);
+                        if (hidden) hidden.value = status;
+                        const parent = btn.parentElement;
+                        parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

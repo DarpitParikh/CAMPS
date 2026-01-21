@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student List</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .back-link:hover { text-decoration: underline; }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn-search {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-search:hover { background-color: #2980b9; }
+        
+        .students-table {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th {
+            background-color: #ecf0f1;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        table tr:hover { background-color: #f9f9f9; }
+        
+        .btn-view {
+            background-color: #27ae60;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-view:hover { background-color: #229954; }
+        
+        .add-btn {
+            background-color: #16a085;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .add-btn:hover { background-color: #138d75; }
+        
+        @media (max-width: 768px) {
+            .filter-group { grid-template-columns: 1fr; }
+            table { font-size: 13px; }
+            table th, table td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👥 Student Management</h1>
+    </div>
+    
+    <div class="container">
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+        
+        {% if user.is_staff %}
+        <a href="{% url 'add_student' %}" class="add-btn">+ Add New Student</a>
+        <a href="{% url 'upload_students' %}" class="add-btn" style="background:#8e44ad;">⬆ Upload Students</a>
+        {% if request.GET.branch and request.GET.semester %}
+        <a href="{% url 'manage_enrollments' %}?branch={{ request.GET.branch }}&semester={{ request.GET.semester }}" class="add-btn" style="background:#e67e22;">⚙ Manage Enrollments</a>
+        {% else %}
+        <a href="{% url 'manage_enrollments' %}" class="add-btn" style="background:#e67e22;">⚙ Manage Enrollments</a>
+        {% endif %}
+        {% endif %}
+        
+        <!-- Filters -->
+        <div class="filters">
+            <form method="get">
+                <div class="filter-group">
+                    <div class="form-group">
+                        <label>Search</label>
+                        <input type="text" name="query" placeholder="Name or enrollment..." value="{{ request.GET.query }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch</label>
+                        <select name="branch">
+                            <option value="">All</option>
+                            {% for branch in form.branch.field.queryset %}
+                            <option value="{{ branch.id }}" {% if request.GET.branch|add:"" == branch.id|add:"" %}selected{% endif %}>{{ branch.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select name="semester">
+                            <option value="">All</option>
+                            {% for sem in form.semester.field.queryset %}
+                            <option value="{{ sem.id }}" {% if request.GET.semester|add:"" == sem.id|add:"" %}selected{% endif %}>Semester {{ sem.number }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Division</label>
+                        <select name="division">
+                            <option value="">All</option>
+                            <option value="A" {% if request.GET.division == 'A' %}selected{% endif %}>A</option>
+                            <option value="B" {% if request.GET.division == 'B' %}selected{% endif %}>B</option>
+                            <option value="C" {% if request.GET.division == 'C' %}selected{% endif %}>C</option>
+                            <option value="D" {% if request.GET.division == 'D' %}selected{% endif %}>D</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mentor</label>
+                        <input type="text" name="mentor" placeholder="Mentor name..." value="{{ request.GET.mentor }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Sort By</label>
+                        <select name="sort">
+                            <option value="enrollment_no" {% if request.GET.sort == 'enrollment_no' or not request.GET.sort %}selected{% endif %}>Enrollment No</option>
+                            <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                            <option value="branch" {% if request.GET.sort == 'branch' %}selected{% endif %}>Branch</option>
+                            <option value="semester" {% if request.GET.sort == 'semester' %}selected{% endif %}>Semester</option>
+                            <option value="division" {% if request.GET.sort == 'division' %}selected{% endif %}>Division</option>
+                            <option value="mentor" {% if request.GET.sort == 'mentor' %}selected{% endif %}>Mentor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Order</label>
+                        <select name="order">
+                            <option value="asc" {% if request.GET.order != 'desc' %}selected{% endif %}>Ascending</option>
+                            <option value="desc" {% if request.GET.order == 'desc' %}selected{% endif %}>Descending</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-search">🔍 Search</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Students Table -->
+        <div class="students-table">
+            {% if students %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name
+                            <a href="?{% if request.GET %}{{ request.GET.urlencode|safe }}&{% endif %}sort=name&order=asc" title="Sort A→Z" style="margin-left:6px; text-decoration:none;">▲</a>
+                            <a href="?{% if request.GET %}{{ request.GET.urlencode|safe }}&{% endif %}sort=name&order=desc" title="Sort Z→A" style="margin-left:4px; text-decoration:none;">▼</a>
+                        </th>
+                        <th>Enrollment No</th>
+                        <th>Branch</th>
+                        <th>Semester</th>
+                        <th>Division</th>
+                        <th>Mentor</th>
+                        <th>Action</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.enrollment_no }}</td>
+                        <td>{{ student.branch.name }}</td>
+                        <td>{{ student.semester.number }}</td>
+                        <td>{{ student.division }}</td>
+                        <td>{{ student.mentor_name|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'student_profile' student.id %}" class="btn-view">View Profile</a>
+                        </td>
+                        <td>
+                            {% if user.is_staff %}
+                                <a href="{% url 'delete_student' student.id %}" class="btn-view" style="background:#e74c3c;">Delete</a>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="padding: 40px; text-align: center; color: #7f8c8d;">
+                <p>No students found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

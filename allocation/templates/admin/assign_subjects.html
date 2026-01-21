@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Subjects to Faculty</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f7fb; margin:0; }
+        .container { max-width: 1100px; margin: 24px auto; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+        h1 { margin: 0 0 12px 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+        .form-group { display:flex; flex-direction:column; }
+        .form-group label { font-weight: 600; margin-bottom: 6px; color:#334155; }
+        select, input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .actions { margin-top: 12px; display:flex; gap:8px; }
+        .btn { padding: 10px 14px; background: #667eea; color:white; border:none; border-radius:6px; text-decoration:none; cursor:pointer; }
+        .btn.secondary { background: #1f2937; }
+        .list { margin-top: 16px; border:1px solid #e5e7eb; border-radius:8px; }
+        .list-header { background:#f9fafb; padding:10px; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; }
+        .subjects { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; padding: 12px; }
+        .subject-item { border:1px solid #e5e7eb; border-radius:8px; padding:10px; display:flex; align-items:center; gap:10px; }
+        .code { font-weight:700; color:#111827; }
+        .msg { margin-top:8px; color:#16a34a; }
+        .back-link { text-decoration:none; color:#2563eb; }
+        .back-link:hover { text-decoration:underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+        <h1>Assign Subjects to Faculty</h1>
+        {% if message %}<div class="msg">{{ message }}</div>{% endif %}
+
+        <form method="get">
+            <div class="grid">
+                <div class="form-group">
+                    <label>Faculty</label>
+                    <select name="faculty" required>
+                        <option value="">Select faculty...</option>
+                        {% for fac in faculties %}
+                        <option value="{{ fac.id }}" {% if selected_faculty and fac.id == selected_faculty.id %}selected{% endif %}>{{ fac.user.get_full_name|default:fac.user.username }} ({{ fac.employee_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Branch</label>
+                    <select name="branch">
+                        <option value="">All</option>
+                        {% for b in branches %}
+                        <option value="{{ b.id }}" {% if branch_id|add:"" == b.id|add:"" %}selected{% endif %}>{{ b.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select name="semester">
+                        <option value="">All</option>
+                        {% for s in semesters %}
+                        <option value="{{ s.id }}" {% if semester_id|add:"" == s.id|add:"" %}selected{% endif %}>Semester {{ s.number }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn">Load Subjects</button>
+            </div>
+        </form>
+
+        {% if selected_faculty %}
+        <div class="list">
+            <div class="list-header">
+                <div>
+                    Assigning to <strong>{{ selected_faculty.user.get_full_name|default:selected_faculty.user.username }}</strong>
+                </div>
+                <div>
+                    {{ subjects|length }} subjects loaded
+                </div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="faculty" value="{{ selected_faculty.id }}" />
+                {% if branch_id %}<input type="hidden" name="branch" value="{{ branch_id }}" />{% endif %}
+                {% if semester_id %}<input type="hidden" name="semester" value="{{ semester_id }}" />{% endif %}
+                <input type="hidden" name="action" value="save_assignments" />
+                <div class="subjects">
+                    {% for subj in subjects %}
+                    <label class="subject-item">
+                        <input type="checkbox" name="subjects" value="{{ subj.id }}" {% if subj.id in assigned_ids %}checked{% endif %}/>
+                        <span class="code">{{ subj.code }}</span>
+                        <span>- {{ subj.name }}</span>
+                        <span style="margin-left:auto; color:#64748b;">Sem {{ subj.semester.number }} • {{ subj.branch.name }}{% if subj.is_elective %} • Elective{% endif %}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="actions" style="padding: 12px;">
+                    <button type="submit" class="btn">Save Assignments</button>
+                    <a href="?faculty={{ selected_faculty.id }}" class="btn secondary">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

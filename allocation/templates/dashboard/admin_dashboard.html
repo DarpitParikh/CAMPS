@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --sidebar: #1f2937;
+            --sidebar-accent: #111827;
+            --primary: #667eea;
+            --primary-2: #5568d3;
+            --text: #1f2937;
+        }
+        body { margin:0; font-family: Arial, sans-serif; background: var(--bg); }
+        .layout { display:flex; min-height:100vh; }
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            color: white;
+            padding: 20px 18px;
+            display:flex; flex-direction:column;
+        }
+        .brand { font-weight: 700; font-size: 18px; margin-bottom: 16px; }
+        .profile {
+            background: var(--sidebar-accent);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        .profile .name { font-weight: 700; }
+        .profile .role { font-size: 13px; color: #cbd5e1; }
+        .nav { list-style: none; padding:0; margin:0; }
+        .nav li { margin-bottom: 8px; }
+        .nav a {
+            display:block;
+            padding: 10px 12px;
+            border-radius:6px;
+            color: white;
+            text-decoration:none;
+            background: transparent;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .nav a:hover { background: rgba(255,255,255,0.08); }
+        .nav .primary { background: var(--primary); }
+        .nav .primary:hover { background: var(--primary-2); }
+        .content { flex:1; padding: 28px; }
+        h1 { margin:0 0 8px 0; color: var(--text); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 16px 0; }
+        .card { background: white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .stat-number { font-size: 32px; font-weight: 700; color: var(--text); }
+        .stat-label { color: #6b7280; font-size: 13px; }
+        .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-top:16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border:1px solid #eee; padding:10px; text-align:left; }
+        th { background:#f9fafb; }
+        .actions { display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 4px 0; }
+        .btn { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; text-decoration:none; }
+        .btn:hover { background: var(--primary-2); }
+        @media (max-width: 900px) { .layout { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap:10px; } .nav { display:flex; flex-wrap: wrap; gap:6px; } .nav li { margin:0; } .content { padding: 18px; } }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">📊 Admin</div>
+            <div class="profile">
+                <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="role">Admin</div>
+                <div class="role">{{ request.user.email }}</div>
+            </div>
+            <ul class="nav">
+                <li><a href="{% url 'dashboard' %}" class="primary">Dashboard</a></li>
+                <li><a href="{% url 'student_list' %}">Students</a></li>
+                <li><a href="{% url 'upload_students' %}">Upload Students</a></li>
+                <li><a href="{% url 'manage_subjects' %}">Subjects</a></li>
+                <li><a href="{% url 'manage_enrollments' %}">Enrollments</a></li>
+                <li><a href="{% url 'assign_subjects' %}">Faculty Assignments</a></li>
+                <li><a href="{% url 'allocate' %}">Seating</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Admin Dashboard</h1>
+            <div class="grid">
+                <div class="card">
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-number">{{ total_students }}</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Total Subjects</div>
+                    <div class="stat-number">{{ total_subjects }}</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Total Faculty</div>
+                    <div class="stat-number">{{ total_faculty }}</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'student_list' %}" class="btn">👥 Manage Students</a>
+                <a href="{% url 'manage_subjects' %}" class="btn">📖 Subjects</a>
+                <a href="{% url 'manage_enrollments' %}" class="btn">⚙ Enrollments</a>
+                <a href="{% url 'assign_subjects' %}" class="btn">👩‍🏫 Faculty Assignments</a>
+                <a href="{% url 'allocate' %}" class="btn">🎫 Seating</a>
+            </div>
+
+        </main>
+    </div>
+</body>
+</html>

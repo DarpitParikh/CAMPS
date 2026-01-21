@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Students</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    .card { border:1px solid #ddd; border-radius:8px; padding:16px; max-width:800px; }
+    label { display:block; margin-top:10px; font-weight:bold; }
+    select, input[type=file] { width:100%; padding:8px; margin-top:6px; }
+    button { margin-top:12px; padding:10px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#5568d3; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-top:16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    th, td { border: 1px solid #eee; padding: 8px; text-align: left; }
+    th { background: #f8f8f8; }
+    .errors { background: #fee; border:1px solid #f99; padding:10px; border-radius:4px; margin-top:16px; }
+  </style>
+</head>
+<body>
+  {% include 'partials/back_to_dashboard.html' %}
+  <h1>Upload Students to Branch & Semester</h1>
+  <p>Upload a CSV or Excel file containing student details. Required columns: <b>enrollment no</b>, <b>name</b>. Optional: <b>division</b>, <b>mentor name</b>, <b>email</b>, <b>phone</b>.</p>
+
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label>Branch</label>
+      {{ form.branch }}
+      <label>Semester</label>
+      {{ form.semester }}
+      <label>File (.csv, .xlsx)</label>
+      {{ form.file }}
+      <button type="submit">Upload</button>
+    </form>
+
+    {% if message %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
+
+    {% if results %}
+      <div class="message">
+        <div><b>Total parsed:</b> {{ results.total }}</div>
+        <div><b>Created:</b> {{ results.created }}</div>
+        <div><b>Skipped (duplicates):</b> {{ results.skipped }}</div>
+      </div>
+    {% endif %}
+
+    {% if results and results.errors %}
+      <div class="errors">
+        <b>Row errors:</b>
+        <ul>
+          {% for e in results.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if preview_rows %}
+      <h2>Preview (first 20 rows)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Enrollment No</th>
+            <th>Name</th>
+            <th>Division</th>
+            <th>Mentor Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in preview_rows %}
+            <tr>
+              <td>{{ r.enrollment_no }}</td>
+              <td>{{ r.name }}</td>
+              <td>{{ r.division }}</td>
+              <td>{{ r.mentor_name }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.phone }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</body>
+</html>

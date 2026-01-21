@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Subjects</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { border:1px solid #ddd; border-radius:8px; padding:16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #eee; padding: 8px; text-align: left; }
+    th { background: #f8f8f8; }
+    label { display:block; margin-top:10px; font-weight:bold; }
+    select, input[type=text], input[type=number] { width:100%; padding:8px; margin-top:6px; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-bottom:16px; }
+    button { margin-top:12px; padding:10px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#5568d3; }
+  </style>
+</head>
+<body>
+  <h1>Manage Subjects by Semester</h1>
+  {% include 'partials/back_to_dashboard.html' %}
+  <p>Select a branch and semester to view existing subjects and add new ones.</p>
+
+  {% if message %}
+    <div class="message">{{ message }}</div>
+  {% endif %}
+
+  <div class="grid">
+    <div class="card">
+      <h2>Subject List</h2>
+      <form method="get">
+        <label>Branch</label>
+        <select name="branch" required>
+          <option value="">-- Select Branch --</option>
+          {% for b in branches %}
+            <option value="{{ b.id }}" {% if b.id|stringformat:'s' == selected_branch_id %}selected{% endif %}>{{ b.name }}</option>
+          {% endfor %}
+        </select>
+        <label>Semester</label>
+        <select name="semester" required>
+          <option value="">-- Select Semester --</option>
+          {% for s in semesters %}
+            <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_semester_id %}selected{% endif %}>{{ s.number }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Load Subjects</button>
+      </form>
+
+      {% if subjects %}
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Internal</th>
+              <th>External</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subj in subjects %}
+              <tr>
+                <td>{{ subj.code }}</td>
+                <td>{{ subj.name }}</td>
+                <td>{{ subj.internal_max }}</td>
+                <td>{{ subj.external_max }}</td>
+                <td>{{ subj.max_marks }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No subjects loaded. Select branch and semester.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Add Subject</h2>
+      <form method="post">
+        {% csrf_token %}
+        <label>Code</label>
+        {{ form.code }}
+        <label>Name</label>
+        {{ form.name }}
+        <label>Branch</label>
+        {{ form.branch }}
+        <label>Semester</label>
+        {{ form.semester }}
+        <label>Internal Max</label>
+        {{ form.internal_max }}
+        <label>External Max</label>
+        {{ form.external_max }}
+        <button type="submit">Add Subject</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

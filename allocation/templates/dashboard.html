@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam Hall Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+            text-align: center;
+        }
+        
+        .stat-box.rooms {
+            border-left-color: #2196F3;
+        }
+        
+        .stat-box.students {
+            border-left-color: #FF9800;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-new {
+            background-color: #4CAF50;
+        }
+        
+        .btn-new:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-view {
+            background-color: #2196F3;
+        }
+        
+        .btn-view:hover {
+            background-color: #0b7dda;
+        }
+        
+        .btn-download {
+            background-color: #FF9800;
+        }
+        
+        .btn-download:hover {
+            background-color: #e68900;
+        }
+        
+        .table-section {
+            margin-top: 30px;
+        }
+        
+        .table-section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th {
+            background-color: #f0f0f0;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Exam Hall Management System</h1>
+        <p class="subtitle">KADI SARVA VISHWAVIDYALAYA - LDRP Institute of Technology and Research</p>
+        
+        <!-- Statistics -->
+        <div class="stats">
+            <div class="stat-box rooms">
+                <div class="stat-label">Total Rooms</div>
+                <div class="stat-number">{{ total_rooms }}</div>
+            </div>
+            <div class="stat-box students">
+                <div class="stat-label">Total Students</div>
+                <div class="stat-number">{{ total_students }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Allocated Seats</div>
+                <div class="stat-number">{{ total_allocated_seats }}</div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="{% url 'allocate' %}" class="btn btn-new">+ New Allocation</a>
+            <a href="{% url 'student_list' %}" class="btn btn-view">👥 View Students</a>
+            {% if total_rooms > 0 %}
+                <a href="{% url 'download' %}" class="btn btn-download">📥 Download PDF</a>
+            {% else %}
+                <button class="btn btn-download" disabled style="opacity: 0.5; cursor: not-allowed;">📥 Download PDF</button>
+            {% endif %}
+        </div>
+        
+        <!-- Room Distribution Table -->
+        {% if rooms_data %}
+        <div class="table-section">
+            <h2>Room-wise Distribution</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Room No</th>
+                        <th>Seats</th>
+                        <th>Allocated</th>
+                        <th>Students</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for room in rooms_data %}
+                    <tr>
+                        <td>{{ room.room_no }}</td>
+                        <td>{{ room.seat_from }} - {{ room.seat_to }}</td>
+                        <td>{{ room.allocated_count }}</td>
+                        <td>{{ room.actual_students }}</td>
+                        <td>
+                            {% if room.actual_students == room.allocated_count %}
+                                ✓ Complete
+                            {% elif room.actual_students > 0 %}
+                                ⚠ Partial
+                            {% else %}
+                                ✗ Empty
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-message">
+            <p>No allocation data yet. Click "New Allocation" to get started.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

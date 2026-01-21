@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+{% load dict_extras %}
+<head>
+  <title>Manage Enrollments</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --sidebar: #1f2937;
+      --sidebar-accent: #111827;
+      --primary: #667eea;
+      --primary-2: #5568d3;
+      --text: #1f2937;
+    }
+    body { margin:0; font-family: Arial, sans-serif; background: var(--bg); }
+    .layout { display:flex; min-height:100vh; }
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      color: white;
+      padding: 20px 18px;
+      display:flex; flex-direction:column;
+    }
+    .brand { font-weight: 700; font-size: 18px; margin-bottom: 16px; }
+    .profile {
+      background: var(--sidebar-accent);
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .profile .name { font-weight: 700; }
+    .profile .role { font-size: 13px; color: #cbd5e1; }
+    .nav { list-style: none; padding:0; margin:0; }
+    .nav li { margin-bottom: 8px; }
+    .nav a {
+      display:block;
+      padding: 10px 12px;
+      border-radius:6px;
+      color: white;
+      text-decoration:none;
+      background: transparent;
+      transition: background 0.2s;
+      font-size: 14px;
+    }
+    .nav a:hover { background: rgba(255,255,255,0.08); }
+    .nav .primary { background: var(--primary); }
+    .nav .primary:hover { background: var(--primary-2); }
+    .content { flex:1; padding: 28px; }
+    h1 { margin:0 0 8px 0; color: var(--text); }
+    .note { color:#555; margin-bottom:16px; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-bottom:16px; }
+    .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+    label { font-weight: 600; color: #374151; display:block; margin-bottom:4px; }
+    select { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; min-width:160px; }
+    button { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; }
+    button:hover { background: var(--primary-2); }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border:1px solid #eee; padding:8px 10px; text-align:left; }
+    th { background:#f8f8f8; }
+    .tag { display:inline-block; padding:2px 6px; border-radius:4px; font-size:12px; }
+    .fixed { background:#e6ffe6; border:1px solid #a6d8a6; }
+    .elective { background:#fff5e6; border:1px solid #e6c38f; }
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap:10px; }
+      .nav { display:flex; flex-wrap: wrap; gap:6px; }
+      .nav li { margin:0; }
+      .content { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">📚 Exam & Academic</div>
+      <div class="profile">
+        <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="role">{{ request.user.is_staff|yesno:"Admin,Faculty" }}</div>
+        <div class="role">{{ request.user.email }}</div>
+      </div>
+      <ul class="nav">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'student_list' %}">Students</a></li>
+        <li><a href="{% url 'upload_students' %}">Upload Students</a></li>
+        <li><a href="{% url 'manage_enrollments' %}" class="primary">Enrollments</a></li>
+        <li><a href="{% url 'manage_subjects' %}">Subjects</a></li>
+        <li><a href="{% url 'mark_attendance' %}">Attendance</a></li>
+        <li><a href="{% url 'allocate' %}">Seating</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <h1>Manage Subject Enrollments</h1>
+      <p class="note">Use toggles to enroll/un-enroll individual students. You can also bulk-assign all <b>fixed</b> subjects (non-elective) to all students.</p>
+
+      {% if message %}
+        <div class="message">{{ message }}</div>
+      {% endif %}
+
+      <div class="panel">
+        <form method="get" class="controls">
+          <div>
+            <label>Branch</label>
+            <select name="branch" required>
+              <option value="">-- Select --</option>
+              {% for b in branches %}
+                <option value="{{ b.id }}" {% if b.id|stringformat:'s' == branch_id %}selected{% endif %}>{{ b.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Semester</label>
+            <select name="semester" required>
+              <option value="">-- Select --</option>
+              {% for s in semesters %}
+                <option value="{{ s.id }}" {% if s.id|stringformat:'s' == semester_id %}selected{% endif %}>{{ s.number }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Division</label>
+            <select name="division">
+              <option value="">All</option>
+              <option value="A" {% if division == 'A' %}selected{% endif %}>A</option>
+              <option value="B" {% if division == 'B' %}selected{% endif %}>B</option>
+              <option value="C" {% if division == 'C' %}selected{% endif %}>C</option>
+              <option value="D" {% if division == 'D' %}selected{% endif %}>D</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit">Load</button>
+          </div>
+        </form>
+      </div>
+
+      {% if branch_id and semester_id %}
+        <div class="message">Selected: Branch {{ branch_id }}, Semester {{ semester_id }}{% if division %}, Division {{ division }}{% endif %}. Loaded: {{ students|length }} students, {{ subjects|length }} subjects.</div>
+      {% endif %}
+
+      {% if students and subjects %}
+        <div class="panel" style="margin-top:16px;">
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="branch" value="{{ branch_id }}">
+            <input type="hidden" name="semester" value="{{ semester_id }}">
+
+            <div class="controls">
+              <button name="action" value="bulk_assign_fixed" type="submit">Assign All Fixed Subjects</button>
+              <button name="action" value="save_toggles" type="submit">Save Toggles</button>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  {% for subj in subjects %}
+                    <th>
+                      {{ subj.code }}
+                      {% if subj.is_elective %}
+                        <span class="tag elective">Elective</span>
+                      {% else %}
+                        <span class="tag fixed">Fixed</span>
+                      {% endif %}
+                    </th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for stu in students %}
+                  <tr>
+                    <td>{{ stu.enrollment_no }} - {{ stu.name }}</td>
+                    {% for subj in subjects %}
+                      <td>
+                           {% with subs=enroll_map|get_item:stu.id %}
+                           <input type="checkbox"
+                             name="enroll_{{ stu.id }}_{{ subj.id }}"
+                             {% if subs and subj.id in subs %}checked{% endif %}>
+                           {% endwith %}
+                      </td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </form>
+        </div>
+      {% elif branch_id and semester_id %}
+        <div class="panel" style="margin-top:16px;">
+          {% if students and not subjects %}
+            <p class="note">Students are loaded, but no subjects are defined for this Branch+Semester.
+              <a href="{% url 'manage_subjects' %}?branch={{ branch_id }}&semester={{ semester_id }}">Add subjects</a> to enable enrollments.
+            </p>
+          {% elif subjects and not students %}
+            <p class="note">Subjects are defined, but no students found for this Branch+Semester{% if division %} / Division {{ division }}{% endif %}. Upload or add students first.</p>
+          {% else %}
+            <p class="note">Select Branch and Semester to load students and subjects.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </main>
+  </div>
+</body>
+</html>
