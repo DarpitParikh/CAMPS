@@ -1,4 +1,4 @@
-# Academic & Examination Management System
+# Campus Academic Management and Planning System
 
 ## Overview
 A faculty-oriented Academic & Examination Management System built for LDRP Institute of Technology and Research. Designed to replace Excel-based workflows with a simple, smart, time-saving internal portal.
@@ -434,3 +434,4 @@ For issues or clarifications, check:
 **Built with ❤️ for LDRP Institute**
 
 Last Updated: December 2025
+
