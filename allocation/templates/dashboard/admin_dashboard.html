@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    {% include 'partials/sidebar_styles.html' %}
+    <style>
+        .content { flex:1; padding: 28px; }
+        h1 { margin:0 0 8px 0; color: var(--text); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 16px 0; }
+        .card { background: white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .stat-number { font-size: 32px; font-weight: 700; color: var(--text); }
+        .stat-label { color: #6b7280; font-size: 13px; }
+        .semester-grid { display:flex; flex-direction:column; gap:16px; margin: 16px 0; }
+        .semester-card { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); border-left:4px solid var(--primary); }
+        .semester-title { font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .semester-meta { color:#6b7280; font-size: 13px; margin-bottom: 10px; }
+        .division-grid { display:flex; flex-wrap:wrap; gap:8px; }
+        .division-item { background:#f9fafb; border:1px solid #eef2f7; border-radius:6px; padding:8px 10px; text-align:center; min-width: 84px; }
+        .division-code { font-weight:700; color: var(--text); }
+        .division-count { font-size: 12px; color:#6b7280; }
+        .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-top:16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border:1px solid #eee; padding:10px; text-align:left; }
+        th { background:#f9fafb; }
+        .actions { display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 4px 0; }
+        .btn { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; text-decoration:none; }
+        .btn:hover { background: var(--primary-2); }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        {% with active_page='dashboard' %}
+        {% include 'partials/sidebar.html' %}
+        {% endwith %}
+
+        <main class="content">
+            <h1>Admin Dashboard</h1>
+            <div class="semester-grid">
+                {% for sem in semester_cards %}
+                <div class="semester-card">
+                    <div class="semester-title">Semester {{ sem.semester }}</div>
+                    <div class="semester-meta">Students: {{ sem.student_total }}</div>
+                    <div class="semester-meta">Subjects: {{ sem.subject_count }} (Compulsory: {{ sem.subject_compulsory_count }}, Elective: {{ sem.subject_elective_count }})</div>
+                    <div class="division-grid">
+                        {% for row in sem.division_rows %}
+                        <div class="division-item">
+                            <div class="division-code">{{ row.division }}</div>
+                            <div class="division-count">Students: {{ row.count }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="card">
+                    <div class="stat-label">No semesters found</div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </main>
+    </div>
+</body>
+</html>

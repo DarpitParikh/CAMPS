@@ -1,0 +1,142 @@
+# Setup Instructions for New PC
+
+## Prerequisites
+- Python 3.10 or higher installed
+- PowerShell or Command Prompt
+
+## Step-by-Step Setup
+
+### 1. Extract the Project
+```powershell
+# Extract the zip file to a location, e.g., D:\examhall
+# Navigate to the project folder
+cd D:\examhall
+```
+
+### 2. Create Virtual Environment (Recommended)
+```powershell
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+.\venv\Scripts\Activate.ps1
+
+# If you get execution policy error, run:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+# Then try activating again
+```
+
+### 3. Install Dependencies
+```powershell
+# Install from the clean requirements file
+pip install -r requirements_clean.txt
+
+# OR if you want to use the original requirements.txt:
+pip install -r requirements.txt
+```
+
+### 4. Database Setup
+```powershell
+# The db.sqlite3 file is included in the zip, so you can use it directly
+# OR if you want a fresh database:
+python manage.py migrate
+```
+
+### 5. Create Superuser (Optional - only for fresh database)
+```powershell
+# Only needed if starting with fresh database
+python manage.py createsuperuser
+```
+
+### 6. Run the Development Server
+
+#### Option A: Quick Start (localhost only)
+```powershell
+python manage.py runserver
+```
+Then open browser: http://127.0.0.1:8000
+
+#### Option B: LAN Access (Multi-PC Lab Setup)
+```powershell
+# Use the batch file for LAN access
+.\launch_lab.bat
+```
+This will:
+- Show your LAN IP address
+- Start server on 0.0.0.0:8000
+- Allow access from other PCs on the same network
+
+Other PCs can access using: http://[YOUR_LAN_IP]:8000
+
+### 7. Verify Installation
+```powershell
+# Check for any issues
+python manage.py check
+```
+
+## Quick Test
+1. Open browser: http://127.0.0.1:8000
+2. You should see the login page
+3. Login with admin credentials
+4. Navigate through the dashboard
+
+## Troubleshooting
+
+### Port Already in Use
+```powershell
+# Use a different port
+python manage.py runserver 8080
+```
+
+### Missing Dependencies Error
+```powershell
+# Reinstall specific package, e.g.:
+pip install openpyxl
+pip install reportlab
+```
+
+### Database Errors
+```powershell
+# If migrations fail, try:
+python manage.py migrate --run-syncdb
+```
+
+### Static Files Not Loading
+```powershell
+# Collect static files
+python manage.py collectstatic --noinput
+```
+
+## Default Login Credentials
+(Check with the person who provided the zip file for credentials)
+
+## Network Configuration
+
+### For LAN Access:
+1. Make sure Windows Firewall allows Python on port 8000
+2. All PCs must be on same network
+3. Use the LAN IP shown when running launch_lab.bat
+
+### Firewall Rule (if needed):
+```powershell
+# Run as Administrator
+New-NetFirewallRule -DisplayName "Django Dev Server" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
+```
+
+## Files Included
+- manage.py - Django management script
+- db.sqlite3 - Database with existing data
+- requirements.txt - All dependencies (has extras)
+- requirements_clean.txt - Minimal required dependencies
+- launch_lab.bat - Quick launcher for LAN access
+- allocation/ - Main application folder
+- examhall/ - Django project settings
+- media/ - Uploaded files storage
+- static/ - Static assets
+
+## Important Notes
+1. The database file (db.sqlite3) contains existing data
+2. Media files are stored in media/ folder
+3. For production deployment, use proper web server (Apache/Nginx)
+4. Keep SECRET_KEY secure in production
+5. Set DEBUG=False for production use

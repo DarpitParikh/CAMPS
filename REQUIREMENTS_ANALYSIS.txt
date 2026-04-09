@@ -1,0 +1,175 @@
+# Requirements.txt Analysis
+
+## REQUIRED PACKAGES (Must Have)
+These are essential for the exam hall management system:
+
+### Django Core
+- Django==5.2 ✓
+- asgiref==3.8.1 ✓
+- sqlparse==0.5.3 ✓
+- tzdata==2025.2 ✓
+
+### Excel/CSV Processing
+- pandas==2.3.0 ✓
+- openpyxl==3.1.5 ✓
+- numpy==2.3.1 ✓ (pandas dependency)
+- et_xmlfile==2.0.0 ✓ (openpyxl dependency)
+- python-dateutil==2.9.0.post0 ✓
+- pytz==2025.2 ✓
+
+### PDF Generation & Processing
+- reportlab==4.4.7 ✓
+- pillow==11.2.1 ✓ (for images in PDFs)
+- PyPDF2==3.0.1 ✓ (for parsing uploaded PDFs)
+
+### Web Push Notifications
+- pywebpush==2.0.3 ✓
+- py-vapid (may be needed, check if included in pywebpush)
+- cryptography (may be needed for push)
+- http-ece (may be needed for push)
+
+### Security & Authentication
+- bcrypt==4.3.0 ✓ (password hashing)
+
+### HTTP & Utilities
+- requests==2.32.4 ✓
+- python-dotenv==1.1.1 ✓ (environment variables)
+- certifi==2025.6.15 ✓
+- charset-normalizer==3.4.2 ✓
+- idna==3.10 ✓
+- urllib3==2.5.0 ✓
+
+---
+
+## UNNECESSARY PACKAGES (Can Remove)
+These are NOT used in the project:
+
+### Streamlit (Not Used)
+- streamlit==1.46.1 ❌
+- streamlit-autorefresh==1.0.1 ❌
+- streamlit-js-eval==0.1.7 ❌
+- altair==5.5.0 ❌
+- pydeck==0.9.1 ❌
+- watchdog==6.0.0 ❌
+- tornado==6.5.1 ❌
+
+### OpenAI (Not Used)
+- openai==1.101.0 ❌
+- httpx==0.28.1 ❌
+- httpcore==1.0.9 ❌
+- h11==0.16.0 ❌
+- httpcore==1.0.9 ❌
+- anyio==4.10.0 ❌
+- sniffio==1.3.1 ❌
+- jiter==0.10.0 ❌
+- pydantic==2.11.7 ❌
+- pydantic_core==2.33.2 ❌
+- typing-inspection==0.4.1 ❌
+- distro==1.9.0 ❌
+- tqdm==4.67.1 ❌
+
+### Data Visualization (Not Used)
+- matplotlib==3.10.3 ❌
+- plotly==6.2.0 ❌
+- kiwisolver==1.4.8 ❌
+- contourpy==1.3.2 ❌
+- cycler==0.12.1 ❌
+- fonttools==4.61.1 ❌
+
+### Telegram Bot (Not Used)
+- python-telegram-bot==22.5 ❌
+- aiohttp==3.12.15 ❌
+- aiohappyeyeballs==2.6.1 ❌
+- aiosignal==1.4.0 ❌
+- frozenlist==1.7.0 ❌
+- multidict==6.6.4 ❌
+- propcache==0.3.2 ❌
+- yarl==1.20.1 ❌
+
+### WeasyPrint (Not Used)
+- weasyprint==67.0 ❌
+- pydyf==0.12.1 ❌
+- pyphen==0.17.2 ❌
+- tinycss2==1.5.1 ❌
+- tinyhtml5==2.0.0 ❌
+- cssselect2==0.8.0 ❌
+- webencodings==0.5.1 ❌
+- brotli==1.2.0 ❌
+- zopfli==0.4.0 ❌
+
+### Excel Writer (Duplicate - openpyxl is used instead)
+- xlsxwriter==3.2.5 ❌
+
+### Network Tools (Not Used)
+- scapy==2.6.1 ❌
+- geoip2==5.1.0 ❌
+- maxminddb==2.8.0 ❌
+
+### Input Simulation (Not Used)
+- pynput==1.8.1 ❌
+
+### Git (Not Used in Runtime)
+- GitPython==3.1.44 ❌
+- gitdb==4.0.12 ❌
+- smmap==5.0.2 ❌
+
+### Testing (Not Needed for Deployment)
+- pytest==9.0.1 ❌
+- pluggy==1.6.0 ❌
+- iniconfig==2.3.0 ❌
+- py==1.11.0 ❌
+
+### Other Unused
+- tenacity==9.1.2 ❌
+- retry==0.9.2 ❌
+- decorator==5.2.1 ❌
+- protobuf==6.31.1 ❌
+- pyarrow==20.0.0 ❌
+- narwhals==1.44.0 ❌
+- jsonschema==4.24.0 ❌
+- jsonschema-specifications==2025.4.1 ❌
+- referencing==0.36.2 ❌
+- rpds-py==0.25.1 ❌
+- Jinja2==3.1.6 ❌
+- MarkupSafe==3.0.2 ❌
+- Pygments==2.19.2 ❌
+- click==8.2.1 ❌
+- blinker==1.9.0 ❌
+- cachetools==6.1.0 ❌
+- colorama==0.4.6 ❌
+- pyparsing==3.2.3 ❌
+- six==1.17.0 ❌
+- toml==0.10.2 ❌
+
+---
+
+## RECOMMENDATION
+
+### For New Installation:
+Use **requirements_clean.txt** - Contains only what's needed (saves disk space & installation time)
+
+### For Existing Installation:
+The extra packages won't hurt, but they waste space (~500MB+ unnecessary)
+
+### Size Comparison:
+- Full requirements.txt: ~1.5 GB installed
+- requirements_clean.txt: ~300 MB installed
+
+### Installation Time:
+- Full requirements.txt: ~10-15 minutes
+- requirements_clean.txt: ~2-3 minutes
+
+---
+
+## Verification Command
+
+To check which packages are actually imported:
+```powershell
+# Find all Python imports in the project
+Get-ChildItem -Path . -Include *.py -Recurse | Select-String -Pattern "^import |^from .* import" | Select-Object -Unique
+```
+
+## Conclusion
+✅ Use `requirements_clean.txt` for new deployments
+✅ Current `requirements.txt` has 80+ packages
+✅ Only ~25 packages are actually needed

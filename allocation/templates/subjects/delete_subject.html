@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delete Subject</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    .card { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:16px; max-width:700px; }
+    .warning { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:10px; border-radius:6px; margin:12px 0; }
+    .actions { display:flex; gap:10px; margin-top:12px; }
+    button, a.btn { padding:10px 16px; border:none; border-radius:4px; text-decoration:none; cursor:pointer; }
+    button { background:#e74c3c; color:white; }
+    button:hover { background:#c0392b; }
+    a.btn { background:#6b7280; color:white; }
+    a.btn:hover { background:#4b5563; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='subjects' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+
+    <main class="content">
+  {% include 'partials/back_to_dashboard.html' %}
+  <h1>Delete Subject</h1>
+  <div class="card">
+    <p>Are you sure you want to delete this subject?</p>
+    <div class="warning">
+      <b>{{ subject.code }}</b> - {{ subject.name }} ({{ subject.branch.name }}, Semester {{ subject.semester.number }})
+    </div>
+    <form method="post" class="actions">
+      {% csrf_token %}
+      <button type="submit">Yes, Delete</button>
+      <a class="btn" href="{% url 'manage_subjects' %}?branch={{ subject.branch_id }}&semester={{ subject.semester_id }}">Cancel</a>
+    </form>
+  </div>
+    </main>
+  </div>
+</body>
+</html>

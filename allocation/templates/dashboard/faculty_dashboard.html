@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Dashboard</title>
+    {% include 'partials/sidebar_styles.html' %}
+    <style>
+        --surface-accent: #eef2ff;
+        .content { flex:1; padding: 28px; }
+        h1 { margin:0 0 8px 0; color: var(--text); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 16px 0; }
+        .card { background: white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-top:16px; }
+        .subject-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+        .subject-card { background:#f8f9fa; border-radius:8px; padding:14px; border-left: 4px solid var(--primary); }
+        .subject-code { font-weight:700; color: #111827; }
+        .subject-name { color:#4b5563; font-size:13px; margin-bottom:10px; }
+        .actions { display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 4px 0; }
+        .btn { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; text-decoration:none; }
+        .btn:hover { background: var(--primary-2); }
+        .note { background: var(--surface-accent); border-left:4px solid var(--primary); padding:12px; border-radius:6px; margin-bottom:16px; color: var(--text); }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        {% with active_page='dashboard' %}
+        {% include 'partials/sidebar.html' %}
+        {% endwith %}
+
+        <main class="content">
+            <h1>Faculty Dashboard</h1>
+
+            {% if last_subject %}
+            <div class="note">✓ Last accessed: <strong>{{ last_subject.code }}</strong> ({{ last_subject.name }})</div>
+            {% endif %}
+
+                        {% if mentored_classes %}
+                        <div class="note">Class mentor for:
+                            {% for mc in mentored_classes %}
+                                <strong>S{{ mc.semester.number }}-{{ mc.division }}</strong>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="note">No mentor class assigned yet.</div>
+                        {% endif %}
+
+            <div class="panel">
+                <div class="actions">
+                    <a href="{% url 'mark_attendance' %}" class="btn">🗓 Mark Attendance</a>
+                    <a href="{% url 'marks_entry' %}" class="btn">🧮 Enter Marks</a>
+                    <a href="{% url 'student_list' %}" class="btn">👥 View Students</a>
+                    <a href="{% url 'attendance_report' %}" class="btn">🎫 Exam Seating</a>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>📖 Your Subjects</h2>
+                {% if subjects %}
+                <div class="subject-grid">
+                    {% for subject in subjects %}
+                    <div class="subject-card">
+                        <div class="subject-code">{{ subject.code }}</div>
+                        <div class="subject-name">{{ subject.name }}</div>
+                        <div class="actions">
+                            <a href="{% url 'mark_attendance' %}?subject={{ subject.id }}" class="btn">Mark Attendance</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p style="color: #7f8c8d;">No subjects assigned</p>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

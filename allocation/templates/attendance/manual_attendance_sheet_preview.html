@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manual Attendance Sheet Preview</title>
+  <style>
+    :root {
+      --border: #111;
+      --text: #111;
+      --muted: #555;
+      --bg: #fff;
+      --action: #2563eb;
+      --action-dark: #1d4ed8;
+      --secondary: #4b5563;
+      --secondary-dark: #374151;
+      --row-height-screen: {{ row_height_screen_px }}px;
+      --row-height-print: {{ row_height_print_px }}px;
+      --cell-pad-y-screen: {{ cell_pad_y_screen_px }}px;
+      --cell-pad-y-print: {{ cell_pad_y_print_px }}px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 10px;
+      color: var(--text);
+      background: #f4f6f8;
+      font-family: Arial, sans-serif;
+    }
+
+    .page {
+      background: var(--bg);
+      border: 1px solid #ddd;
+      padding: 8px 10px 10px;
+      overflow-x: auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .header h1,
+    .header h2,
+    .header h3 {
+      margin: 2px 0;
+      font-weight: 700;
+    }
+
+    .header h1 { font-size: 15px; }
+    .header h2 { font-size: 13px; }
+    .header h3 { font-size: 12px; }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px 10px;
+      margin: 4px 0 8px;
+      font-size: 11px;
+    }
+
+    .meta div {
+      border: 1px solid #ddd;
+      padding: 3px 5px;
+      min-height: 22px;
+    }
+
+    .meta strong { font-weight: 700; }
+
+    .sheet {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background: #fff;
+      font-size: 10px;
+    }
+
+    .sheet th,
+    .sheet td {
+      border: 1px solid var(--border);
+      padding: var(--cell-pad-y-screen) 2px;
+      text-align: center;
+      vertical-align: middle;
+      height: var(--row-height-screen);
+    }
+
+    .sheet th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+
+    .col-sr { width: 34px; }
+    .col-enr { width: 92px; }
+    .col-name { width: 170px; text-align: left; }
+    .col-div { width: 42px; }
+    .col-day { width: 26px; }
+
+    .sheet td.col-name { text-align: left; }
+
+    .actions {
+      margin: 12px 0 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-print { background: var(--action); }
+    .btn-print:hover { background: var(--action-dark); }
+    .btn-back { background: var(--secondary); }
+    .btn-back:hover { background: var(--secondary-dark); }
+
+    .note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 6mm;
+      }
+
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        padding: 0;
+      }
+
+      .actions,
+      .note {
+        display: none;
+      }
+
+      .sheet {
+        font-size: 7.5px;
+      }
+
+      .sheet th,
+      .sheet td {
+        padding: 1px 1px;
+        height: var(--row-height-print);
+        line-height: 1.05;
+        padding-top: var(--cell-pad-y-print);
+        padding-bottom: var(--cell-pad-y-print);
+      }
+
+      .col-sr { width: 26px; }
+      .col-enr { width: 82px; }
+      .col-name { width: 145px; }
+      .col-div { width: 34px; }
+      .col-day { width: 18px; }
+
+      .meta {
+        font-size: 8px;
+        margin: 2px 0 4px;
+      }
+
+      .meta div {
+        min-height: 16px;
+        padding: 2px 4px;
+      }
+
+      .header {
+        margin-bottom: 2px;
+      }
+
+      .header h1 { font-size: 10px; margin: 1px 0; }
+      .header h2 { font-size: 9px; margin: 1px 0; }
+      .header h3 { font-size: 8px; margin: 1px 0; }
+
+      .sheet thead {
+        display: table-header-group;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <h1>{{ institute_line1 }}</h1>
+      <h2>{{ institute_line2 }}</h2>
+      <h3>MONTHLY MANUAL ATTENDANCE SHEET</h3>
+    </div>
+
+    <div class="meta">
+      <div><strong>Branch:</strong> {{ subject_obj.branch.name }}{% if subject_obj.branch.code %} ({{ subject_obj.branch.code }}){% endif %}</div>
+      <div><strong>Sem/Div:</strong> {{ subject_obj.semester.number }} / {% if selected_divisions %}{{ selected_divisions|join:', ' }}{% else %}All{% endif %}</div>
+      <div><strong>Subject:</strong> {{ subject_obj.code }} - {{ subject_obj.name }}</div>
+      <div><strong>Month:</strong> {{ month_name }} {{ year_value }}</div>
+    </div>
+
+    <table class="sheet">
+      <thead>
+        <tr>
+          <th class="col-sr">Sr</th>
+          <th class="col-enr">Enrollment No.</th>
+          <th class="col-name">Student Name</th>
+          <th class="col-div">Div</th>
+          {% for day in day_columns %}
+            <th class="col-day">{{ day }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for sheet in sheet_pairs %}
+          {% for row in sheet.front_rows %}
+          <tr>
+            <td class="col-sr">{{ row.sr }}</td>
+            <td class="col-enr">{% if not row.is_blank %}{{ row.student.enrollment_no }}{% else %}&nbsp;{% endif %}</td>
+            <td class="col-name">{% if not row.is_blank %}{{ row.student.name }}{% else %}&nbsp;{% endif %}</td>
+            <td class="col-div">{% if not row.is_blank %}{{ row.student.division }}{% else %}&nbsp;{% endif %}</td>
+            {% for day in day_columns %}
+              <td class="col-day">&nbsp;</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+          {% if sheet.has_back_rows %}
+            {% for row in sheet.back_rows %}
+            <tr>
+              <td class="col-sr">{{ row.sr }}</td>
+              <td class="col-enr">{% if not row.is_blank %}{{ row.student.enrollment_no }}{% else %}&nbsp;{% endif %}</td>
+              <td class="col-name">{% if not row.is_blank %}{{ row.student.name }}{% else %}&nbsp;{% endif %}</td>
+              <td class="col-div">{% if not row.is_blank %}{{ row.student.division }}{% else %}&nbsp;{% endif %}</td>
+              {% for day in day_columns %}
+                <td class="col-day">&nbsp;</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="actions">
+      <button type="button" class="btn btn-print" onclick="window.print()">Download PDF / Print (Ctrl+P)</button>
+      <a href="{% url 'mark_attendance' %}?subject={{ subject_obj.id }}{% if date_text %}&date={{ date_text }}{% endif %}&rows_per_page={{ rows_per_side }}{% for div in selected_divisions %}&division={{ div }}{% endfor %}" class="btn btn-back">Back to Mark Attendance</a>
+    </div>
+    <div class="note">Generated on {{ generated_on }}. Use browser Print and choose "Save as PDF" for download.</div>
+  </div>
+</body>
+</html>

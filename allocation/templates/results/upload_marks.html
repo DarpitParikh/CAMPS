@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Marks</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    .card { border:1px solid #ddd; border-radius:8px; padding:16px; max-width:900px; }
+    label { display:block; margin-top:10px; font-weight:bold; }
+    input[type=file] { width:100%; padding:8px; margin-top:6px; }
+    button { margin-top:12px; padding:10px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#5568d3; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-top:16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    th, td { border: 1px solid #eee; padding: 8px; text-align: left; }
+    th { background: #f8f8f8; }
+    .errors { background: #fee; border:1px solid #f99; padding:10px; border-radius:4px; margin-top:16px; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='marks' %}
+      {% include 'partials/sidebar.html' %}
+    {% endwith %}
+    <main class="content">
+      <h1>Upload Marksheet Data (CSV/XLSX)</h1>
+      <p>Supported formats: flat CSV/XLSX with required columns, or consolidated university-style Excel sheets (multi-row headers with subject GP columns).</p>
+      <p>
+        <a href="{% url 'download_marks_upload_sample' %}">Download Flat Format Sample</a>
+        |
+        <a href="{% url 'download_marks_upload_sample' %}?layout=consolidated">Download Consolidated Format Sample</a>
+      </p>
+      <p>Flat format required columns: <b>enrollment_no</b>, <b>semester</b>, <b>exam_session</b>, <b>course_code</b>, <b>course_name</b>, <b>course_credit</b>, <b>grade</b>.</p>
+  <p>Optional columns: <b>exam_no</b>, <b>issued_date</b>, <b>spi</b>, <b>cpi</b>, <b>earned_credits</b>, <b>earned_grade_points</b>, <b>total_credits</b>, <b>total_grade_points</b>, <b>result_status</b>.</p>
+
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label>File (.csv, .xlsx)</label>
+      {{ form.file }}
+      <button type="submit">Upload</button>
+    </form>
+
+    {% if message %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
+
+    {% if results %}
+      <div class="message">
+        <div><b>Total rows:</b> {{ results.total }}</div>
+        <div><b>Created:</b> {{ results.created }}</div>
+        <div><b>Updated:</b> {{ results.updated }}</div>
+      </div>
+    {% endif %}
+
+    {% if results and results.errors %}
+      <div class="errors">
+        <b>Row errors:</b>
+        <ul>
+          {% for e in results.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if preview_rows %}
+      <h2>Preview (first 20 rows)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Enrollment No</th>
+            <th>Semester</th>
+            <th>Exam Session</th>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Credit</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in preview_rows %}
+            <tr>
+              <td>{{ r.enrollment_no }}</td>
+              <td>{{ r.semester }}</td>
+              <td>{{ r.exam_session }}</td>
+              <td>{{ r.course_code }}</td>
+              <td>{{ r.course_name }}</td>
+              <td>{{ r.course_credit }}</td>
+              <td>{{ r.grade }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+    </main>
+  </div>
+</body>
+</html>

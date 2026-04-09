@@ -1,0 +1,199 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    QUICK REFERENCE - NEW PC SETUP                          ║
+║                   Exam Hall Management System Transfer                     ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════
+STEP 1: EXTRACT FILES
+═══════════════════════════════════════════════════════════════════════════
+1. Extract the zip file to any location (e.g., D:\examhall)
+2. Open PowerShell or Command Prompt as Administrator
+
+
+═══════════════════════════════════════════════════════════════════════════
+STEP 2: AUTOMATED SETUP (RECOMMENDED - EASIEST!)
+═══════════════════════════════════════════════════════════════════════════
+
+Just double-click:  FIRST_TIME_SETUP.bat
+
+OR run in terminal:
+    cd D:\examhall
+    .\FIRST_TIME_SETUP.bat
+
+This will automatically:
+✓ Check Python installation
+✓ Create virtual environment
+✓ Install all dependencies
+✓ Verify Django setup
+
+Then skip to STEP 5 to start the server!
+
+
+═══════════════════════════════════════════════════════════════════════════
+STEP 3: MANUAL SETUP (If automated doesn't work)
+═══════════════════════════════════════════════════════════════════════════
+
+Navigate to project:
+    cd D:\examhall
+
+Create virtual environment:
+    python -m venv venv
+
+Activate virtual environment:
+    .\venv\Scripts\Activate.ps1
+
+If you get execution policy error:
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    .\venv\Scripts\Activate.ps1
+
+Install dependencies (choose ONE):
+    pip install -r requirements_clean.txt     (Recommended - faster)
+    OR
+    pip install -r requirements.txt           (Complete - has extras)
+
+
+═══════════════════════════════════════════════════════════════════════════
+STEP 4: VERIFY INSTALLATION
+═══════════════════════════════════════════════════════════════════════════
+
+Check for errors:
+    python manage.py check
+
+Should show: "System check identified no issues (0 silenced)."
+
+
+═══════════════════════════════════════════════════════════════════════════
+STEP 5: START THE SERVER
+═══════════════════════════════════════════════════════════════════════════
+
+OPTION A - Single PC (localhost only):
+    python manage.py runserver
+
+    Access at: http://127.0.0.1:8000
+
+
+OPTION B - Multi-PC Lab (LAN access):
+    .\launch_lab.bat
+
+    It will show your LAN IP address
+    Other PCs can access at: http://[LAN-IP]:8000
+    Example: http://192.168.1.100:8000
+
+
+═══════════════════════════════════════════════════════════════════════════
+QUICK COMMANDS SUMMARY
+═══════════════════════════════════════════════════════════════════════════
+
+# First time on new PC:
+cd D:\examhall
+.\FIRST_TIME_SETUP.bat
+.\launch_lab.bat
+
+# Daily use (if virtual env already set up):
+cd D:\examhall
+venv\Scripts\activate
+python manage.py runserver
+# OR for LAN access:
+.\launch_lab.bat
+
+
+═══════════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════
+
+Problem: "Python not found"
+Fix: Install Python 3.10+ from python.org
+     Make sure to check "Add Python to PATH" during installation
+
+Problem: "Port 8000 already in use"
+Fix: Use different port:  python manage.py runserver 8080
+
+Problem: Other PCs can't access on LAN
+Fix: Check Windows Firewall:
+     New-NetFirewallRule -DisplayName "Django Dev" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
+
+Problem: Missing module errors
+Fix: Reinstall requirements:
+     pip install -r requirements_clean.txt
+
+Problem: Virtual environment activation fails
+Fix: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+
+═══════════════════════════════════════════════════════════════════════════
+DEFAULT ACCESS
+═══════════════════════════════════════════════════════════════════════════
+
+URL: http://127.0.0.1:8000
+Login: (Use credentials from current system admin)
+
+Database file (db.sqlite3) is already included with data!
+
+
+═══════════════════════════════════════════════════════════════════════════
+REQUIREMENTS.TXT INFORMATION
+═══════════════════════════════════════════════════════════════════════════
+
+✓ requirements_clean.txt   → 25 packages,  ~300 MB,  2-3 min install
+  requirements.txt         → 80+ packages, ~1.5 GB, 10-15 min install
+
+Recommendation: Use requirements_clean.txt (faster & smaller)
+Both work fine - original has many unused packages
+
+
+═══════════════════════════════════════════════════════════════════════════
+NETWORK CONFIGURATION FOR LAB
+═══════════════════════════════════════════════════════════════════════════
+
+1. Run launch_lab.bat on the main PC (server)
+2. Note the LAN IP shown (e.g., 192.168.1.100)
+3. On client PCs, open browser: http://192.168.1.100:8000
+4. All PCs must be on same network
+5. Server PC must keep launch_lab.bat running
+
+
+═══════════════════════════════════════════════════════════════════════════
+FILES INCLUDED IN ZIP
+═══════════════════════════════════════════════════════════════════════════
+
+Essential:
+  ✓ manage.py
+  ✓ db.sqlite3 (database with existing data)
+  ✓ requirements.txt & requirements_clean.txt
+  ✓ allocation/ (application folder)
+  ✓ examhall/ (settings folder)
+  ✓ media/ (uploaded files)
+
+Setup Scripts:
+  ✓ FIRST_TIME_SETUP.bat (NEW - automated setup)
+  ✓ launch_lab.bat (LAN launcher)
+  ✓ launch_lab.vbs (silent launcher)
+
+Documentation:
+  ✓ SETUP_INSTRUCTIONS.txt (detailed guide)
+  ✓ ZIP_TRANSFER_GUIDE.txt (this file info)
+  ✓ REQUIREMENTS_ANALYSIS.txt (package details)
+  ✓ QUICK_START.txt (this file)
+
+
+═══════════════════════════════════════════════════════════════════════════
+SUPPORT
+═══════════════════════════════════════════════════════════════════════════
+
+For detailed information, see:
+  - SETUP_INSTRUCTIONS.txt (complete setup guide)
+  - ZIP_TRANSFER_GUIDE.txt (what to zip/exclude)
+  - REQUIREMENTS_ANALYSIS.txt (package breakdown)
+
+
+═══════════════════════════════════════════════════════════════════════════
+READY TO GO!
+═══════════════════════════════════════════════════════════════════════════
+
+Quickest path:
+1. Extract zip
+2. Run FIRST_TIME_SETUP.bat
+3. Run launch_lab.bat
+4. Open http://127.0.0.1:8000 in browser
+
+That's it! 🚀

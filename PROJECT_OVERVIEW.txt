@@ -1,0 +1,72 @@
+Examhall Project - File Explanations
+-----------------------------------
+
+High-Level
+- manage.py: Django project entry for commands (runserver, migrate, createsuperuser).
+- examhall/settings.py: Core settings (apps, DB, static/media paths, allowed hosts, secret key via env). Use DJANGO_SECRET_KEY, DJANGO_DEBUG, DJANGO_ALLOWED_HOSTS, DJANGO_CSRF_TRUSTED_ORIGINS in deployment.
+- examhall/urls.py: Root URL routes; includes allocation app URLs.
+- examhall/wsgi.py and asgi.py: Entry points for WSGI/ASGI servers in production.
+
+App: allocation/
+- apps.py: App config registration.
+- models.py: Data models (Students, Subjects, Enrollments, Rooms, Marks, Attendance, etc.). Defines DB schema and relationships.
+- forms.py: Django forms used in templates (authentication/login, allocations, uploads, etc.).
+- views.py: Core page views (dashboard, allocation, seating, etc.).
+- auth_views.py: Authentication-related views (login/logout logic).
+- urls.py: App-specific URL patterns mapping to views (dashboard, attendance, seating, student CRUD, etc.).
+- admin.py: Admin registrations for models to appear in Django admin.
+- templatetags/dict_extras.py: Custom template filters (e.g., dict lookups) for templates.
+- migrations/: Auto-generated DB migrations for schema changes.
+
+Templates (allocation/templates/...)
+- auth/login.html: Login page UI with logo and gradient styling.
+- dashboard/admin_dashboard.html: Admin dashboard layout, navigation, stats, tables, and action buttons.
+- dashboard/faculty_dashboard.html: Faculty dashboard layout with consistent color palette and subject actions.
+- dashboard.html: Base/simple dashboard view (legacy/simple overview).
+- allocate.html: Seating arrangement form page (simple form layout for generating seating).
+- preview.html: Seating/arrangement preview for printing/exporting.
+- student_list.html: Student listing table (non-namespaced template).
+- students/*: Student CRUD pages (add, list, profile, upload, delete confirm).
+- subjects/*: Subject management (manage subjects, enrollments).
+- admin/*: Admin-specific pages (assign subjects, manage roles).
+- attendance/mark_attendance.html: Attendance marking UI for faculty/admin.
+- partials/back_to_dashboard.html: Shared partial to navigate back to dashboard.
+
+Static assets
+- allocation/static/allocation/...: Images, CSS/JS if added. college_logo.png stored under images/.
+
+Other docs
+- DEPLOYMENT_CHECKLIST.md: Steps or notes for deployment.
+- IMPLEMENTATION_COMPLETE.md: Notes indicating completed features.
+- STUDENT_FEATURE_README.md: Student features description/use.
+- SYSTEM_README.md: System overview/use instructions.
+
+Databases
+- db.sqlite3: Current development database (local/testing). Not for production backups.
+- db_backup_20251223_200826.sqlite3: Backup snapshot.
+
+Quickstart scripts
+- quickstart.bat / quickstart.sh: Helper scripts to set up/run project.
+
+How to run locally
+1) Create venv and install deps: pip install -r requirements.txt (or existing venv).
+2) Set env vars as needed (DJANGO_SECRET_KEY, DJANGO_DEBUG=True for local).
+3) Run migrations: python manage.py migrate.
+4) Start server: python manage.py runserver.
+
+Production notes
+- Use Postgres (recommended) instead of SQLite for multi-user deployment.
+- Run collectstatic: python manage.py collectstatic --noinput (staticfiles dir).
+- Set DEBUG=False, configure ALLOWED_HOSTS/CSRF origins, and serve static/media via web server or platform defaults.
+
+Authentication flow
+- Login page posts to Django auth view; auth_views.py handles login/logout; templates show errors; dashboards are protected.
+
+Seating/Allocation flow
+- allocate.html shows form (views.py) to generate seating; preview.html renders arrangement.
+
+Students/Subjects/Attendance
+- CRUD via views/forms/templates; attendance marking page for faculty/admin.
+
+Testing
+- allocation/tests.py: Placeholder/tests for allocation app (extend as needed).

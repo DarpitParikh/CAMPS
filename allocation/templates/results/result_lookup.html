@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Result Lookup</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --surface: #ffffff;
+      --bg: #eef2ff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(79, 70, 229, 0.12), transparent 35%),
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.10), transparent 40%),
+        #f8fafc;
+    }
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 18px 24px 0 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .top-link {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--border);
+      color: #1f2937;
+      text-decoration: none;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+      transition: all 0.2s ease;
+    }
+    .top-link:hover { transform: translateY(-1px); background: #fff; }
+    .content { max-width: 1100px; margin: 0 auto; padding: 18px 24px 34px 24px; }
+    .hero {
+      background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+      color: white;
+      border-radius: 16px;
+      padding: 22px 24px;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.25);
+      margin-bottom: 16px;
+    }
+    .hero h1 { margin: 0; font-size: 30px; }
+    .hero p { margin: 8px 0 0 0; color: rgba(255,255,255,0.92); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #fff;
+    }
+    input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12); }
+    button {
+      margin-top: 14px;
+      padding: 11px 18px;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+    }
+    button:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); }
+    .message {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 16px;
+      color: #1e3a8a;
+    }
+    .student-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 8px 14px;
+      margin-top: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .student-meta div { font-size: 14px; }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      border-bottom: 1px solid #eef2f7;
+      padding: 10px;
+      text-align: left;
+    }
+    th { background: #f8fafc; color: #374151; font-size: 13px; }
+    tbody tr:last-child td { border-bottom: none; }
+    .actions { margin-top: 12px; color: #374151; }
+    .actions strong { color: #111827; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .stat {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    a.btn {
+      display: inline-block;
+      padding: 9px 14px;
+      background: #111827;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    a.btn:hover { background: #1f2937; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="top-link" href="{% url 'public_home' %}">Home</a>
+    <a class="top-link" href="{% url 'public_notices' %}">🔔 Announcements</a>
+  </div>
+  <main class="content">
+      <section class="hero">
+        <h1>Result Lookup</h1>
+        <p>Check semester result instantly using enrollment number.</p>
+      </section>
+
+      <div class="card">
+    <form method="post">
+      {% csrf_token %}
+      <label>Enrollment Number</label>
+      {{ form.enrollment_no }}
+      <label>Semester</label>
+      {{ form.semester }}
+      <button type="submit">Preview Result</button>
+    </form>
+
+    {% if error %}
+      <div class="message">{{ error }}</div>
+    {% endif %}
+
+    {% if student %}
+      <h2>Preview</h2>
+      <div class="student-meta">
+        <div><strong>Name:</strong> {{ student.name }}</div>
+        <div><strong>Enrollment:</strong> {{ student.enrollment_no }}</div>
+        <div><strong>Branch:</strong> {{ student.branch.name }}</div>
+        <div><strong>Semester:</strong> {{ student.semester.number }}</div>
+        <div><strong>Exam Session:</strong> {{ sheet.exam_session }}</div>
+        <div><strong>Exam No:</strong> {{ student.exam_no|default:"-" }}</div>
+        {% if sheet.issued_date %}
+          <div><strong>Issued Date:</strong> {{ sheet.issued_date }}</div>
+        {% endif %}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Subject Name</th>
+            <th>Course Credit</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>{{ r.code }}</td>
+              <td>{{ r.name }}</td>
+              <td>{{ r.credit }}</td>
+              <td>{{ r.grade }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="stats">
+        <div class="stat"><strong>Credits:</strong> {{ sheet.earned_credits }}</div>
+        <div class="stat"><strong>Earned Grade Points:</strong> {{ sheet.earned_grade_points }}</div>
+        <div class="stat"><strong>SPI:</strong> {{ sheet.spi }}</div>
+        <div class="stat"><strong>Total Credits:</strong> {{ sheet.total_credits }}</div>
+        <div class="stat"><strong>Total Grade Points:</strong> {{ sheet.total_grade_points }}</div>
+        <div class="stat"><strong>CPI:</strong> {{ sheet.cpi }}</div>
+        <div class="stat"><strong>Result:</strong> {{ sheet.result_status }}</div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="{% url 'public_result_pdf' %}?enrollment_no={{ student.enrollment_no }}&semester={{ student.semester.number }}">Download Marksheet (PDF)</a>
+      </div>
+    {% endif %}
+  </div>
+  </main>
+</body>
+</html>

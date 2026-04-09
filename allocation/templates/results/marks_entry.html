@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% load dict_extras %}
+  <title>Marks Entry</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    .panel { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); margin-bottom: 16px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    label { font-weight: 600; color:#374151; display:block; margin-bottom: 4px; }
+    input, select { width:100%; padding: 9px; border:1px solid #d1d5db; border-radius: 6px; }
+    button { padding: 10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; }
+    button:hover { background: var(--primary-2); }
+    table { width:100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border:1px solid #eee; padding: 8px; text-align:left; }
+    th { background:#f8f8f8; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:6px; margin-bottom: 14px; }
+    .table-wrap { overflow-x:auto; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='marks_entry' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+
+    <main class="content">
+      <h1>Marks Entry</h1>
+      {% include 'partials/back_to_dashboard.html' %}
+
+      {% if message %}
+      <div class="message">{{ message }}</div>
+      {% endif %}
+
+      {% if mentor_error %}
+      <div class="message" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">{{ mentor_error }}</div>
+      {% endif %}
+
+      <div class="panel">
+        <form method="get">
+          <div class="grid">
+            <div>
+              <label>Semester</label>
+              {{ form.semester }}
+            </div>
+            <div>
+              <label>Subject</label>
+              <select name="subject" id="subject_select" required>
+                <option value="">Select Subject...</option>
+                {% for subj in form.subject.field.queryset %}
+                <option value="{{ subj.id }}" data-semester-id="{{ subj.semester_id }}" {% if request.GET.subject|add:'' == subj.id|add:'' %}selected{% endif %}>{{ subj.code }} - {{ subj.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label>Division</label>
+              {{ form.division }}
+            </div>
+            <div>
+              <label>Exam Type</label>
+              {{ form.exam_type }}
+            </div>
+            <div>
+              <label>Exam Session</label>
+              {{ form.exam_session }}
+            </div>
+            <div>
+              <label>Attempt No</label>
+              {{ form.attempt_no }}
+            </div>
+            <div>
+              <label>Max Marks</label>
+              {{ form.max_marks }}
+            </div>
+            <div>
+              <label>Pass Marks</label>
+              {{ form.pass_marks }}
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <button type="submit">Load Students</button>
+          </div>
+        </form>
+      </div>
+
+      {% if students %}
+      <div class="panel">
+        {% if is_frozen %}
+        <div class="message" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">
+          This marks set is currently frozen.
+          {% if freeze_rule and freeze_rule.note %}
+          Note: {{ freeze_rule.note }}
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if user.is_staff %}
+        <form method="post" style="margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:end;">
+          {% csrf_token %}
+          <input type="hidden" name="semester" value="{{ form.semester.value }}">
+          <input type="hidden" name="subject" value="{{ form.subject.value }}">
+          {% for d in selected_divisions %}
+          <input type="hidden" name="division" value="{{ d }}">
+          {% endfor %}
+          <input type="hidden" name="exam_type" value="{{ form.exam_type.value }}">
+          <input type="hidden" name="exam_session" value="{{ form.exam_session.value }}">
+          <input type="hidden" name="attempt_no" value="{{ form.attempt_no.value }}">
+          <input type="hidden" name="max_marks" value="{{ form.max_marks.value }}">
+          <input type="hidden" name="pass_marks" value="{{ form.pass_marks.value }}">
+          <div style="min-width:280px; flex:1;">
+            <label>Freeze Note (optional)</label>
+            <input type="text" name="freeze_note" placeholder="Reason for freeze/unfreeze">
+          </div>
+          <button type="submit" name="action" value="freeze_marks">Freeze Marks</button>
+          <button type="submit" name="action" value="unfreeze_marks" style="background:#6b7280;">Unfreeze</button>
+        </form>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="semester" value="{{ form.semester.value }}">
+          <input type="hidden" name="subject" value="{{ form.subject.value }}">
+          {% for d in selected_divisions %}
+          <input type="hidden" name="division" value="{{ d }}">
+          {% endfor %}
+          <input type="hidden" name="exam_type" value="{{ form.exam_type.value }}">
+          <input type="hidden" name="exam_session" value="{{ form.exam_session.value }}">
+          <input type="hidden" name="attempt_no" value="{{ form.attempt_no.value }}">
+          <input type="hidden" name="max_marks" value="{{ form.max_marks.value }}">
+          <input type="hidden" name="pass_marks" value="{{ form.pass_marks.value }}">
+
+          <div style="margin: 10px 0;">
+            <label>Change Reason (for audit log)</label>
+            <input type="text" name="audit_reason" placeholder="Why were marks changed?" style="max-width:480px;">
+          </div>
+
+          <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Enrollment</th>
+                <th>Name</th>
+                <th>Division</th>
+                <th>Marks</th>
+                <th>Absent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stu in students %}
+              {% with rec=existing_marks|get_item:stu.id %}
+              <tr>
+                <td>{{ stu.enrollment_no }}</td>
+                <td>{{ stu.name }}</td>
+                <td>{{ stu.division }}</td>
+                <td>
+                  <input type="number" step="0.5" min="0" max="{{ form.max_marks.value|default:'100' }}" name="marks_{{ stu.id }}" value="{% if rec and rec.marks_obtained is not None %}{{ rec.marks_obtained }}{% endif %}">
+                </td>
+                <td>
+                  <input type="checkbox" name="absent_{{ stu.id }}" {% if rec and rec.is_absent %}checked{% endif %}>
+                </td>
+              </tr>
+              {% endwith %}
+              {% endfor %}
+            </tbody>
+          </table>
+          </div>
+
+          <div style="margin-top: 12px;">
+            <button type="submit" name="action" value="save_marks" {% if is_frozen %}disabled style="background:#9ca3af; cursor:not-allowed;"{% endif %}>Save Marks</button>
+          </div>
+        </form>
+      </div>
+      {% endif %}
+    </main>
+  </div>
+
+  <script>
+    (function() {
+      const semesterSelect = document.getElementById('id_semester');
+      const subjectSelect = document.getElementById('subject_select');
+      if (!semesterSelect || !subjectSelect) return;
+
+      const allOptions = Array.from(subjectSelect.querySelectorAll('option'));
+
+      function rebuildSubjects() {
+        const semesterId = semesterSelect.value;
+        const previousValue = subjectSelect.value;
+        const filtered = allOptions.filter(function(option) {
+          if (!option.value) return true;
+          return !semesterId || option.getAttribute('data-semester-id') === semesterId;
+        });
+
+        subjectSelect.innerHTML = '';
+        filtered.forEach(function(option) { subjectSelect.appendChild(option); });
+
+        const valid = filtered.some(function(option) { return option.value === previousValue; });
+        subjectSelect.value = valid ? previousValue : '';
+      }
+
+      semesterSelect.addEventListener('change', rebuildSubjects);
+      rebuildSubjects();
+    })();
+  </script>
+</body>
+</html>

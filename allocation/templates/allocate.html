@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CE Seating Arrangement</title>
+    {% include 'partials/sidebar_styles.html' %}
+    <style>
+        .content { flex:1; padding: 28px; }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #5568d3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        {% with active_page='seating' %}
+            {% include 'partials/sidebar.html' %}
+        {% endwith %}
+        <main class="content">
+            <div class="form-container">
+                <h2>CE Seating Arrangement Generator</h2>
+                <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generate Seating Arrangement</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

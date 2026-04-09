@@ -1,0 +1,32 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Django local settings and environment
+.env
+*.env
+
+# Django database and backups (do not commit local DB)
+db.sqlite3
+db_backup_*.sqlite3
+
+# Collected static and uploaded media
+staticfiles/
+media/
+
+# Security keys and certificates
+*.pem
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+*.log
+
+# Windows shortcuts
+*.lnk

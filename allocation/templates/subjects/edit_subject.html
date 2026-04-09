@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Subject</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    .card { background:white; border:1px solid #e5e7eb; border-radius:8px; padding:16px; max-width:700px; }
+    label { display:block; margin-top:10px; font-weight:bold; }
+    input[type=text], input[type=number], select { width:100%; padding:8px; margin-top:6px; }
+    .row { display:flex; gap:12px; align-items:center; }
+    .row label { margin-top:0; }
+    .actions { margin-top:16px; display:flex; gap:10px; }
+    button, a.btn { padding:10px 16px; border:none; border-radius:4px; text-decoration:none; cursor:pointer; }
+    button { background:#667eea; color:white; }
+    button:hover { background:#5568d3; }
+    a.btn { background:#6b7280; color:white; }
+    a.btn:hover { background:#4b5563; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='subjects' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+
+    <main class="content">
+  {% include 'partials/back_to_dashboard.html' %}
+  <h1>Edit Subject</h1>
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+      <label>Code</label>
+      {{ form.code }}
+      <label>Name</label>
+      {{ form.name }}
+      <label>Branch</label>
+      {{ form.branch }}
+      <label>Semester</label>
+      {{ form.semester }}
+      <label>Credit</label>
+      {{ form.credit }}
+      <label>Elective Group</label>
+      {{ form.elective_group }}
+      <div class="row" style="margin-top:12px;">
+        {{ form.is_elective }}
+        <label for="{{ form.is_elective.id_for_label }}">Elective</label>
+      </div>
+      <div class="actions">
+        <button type="submit">Save Changes</button>
+        <a class="btn" href="{% url 'manage_subjects' %}?branch={{ subject.branch_id }}&semester={{ subject.semester_id }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+    </main>
+  </div>
+</body>
+</html>

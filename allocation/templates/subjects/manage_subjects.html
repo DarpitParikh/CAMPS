@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Subjects</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { border:1px solid #ddd; border-radius:8px; padding:16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #eee; padding: 8px; text-align: left; }
+    th { background: #f8f8f8; }
+    label { display:block; margin-top:10px; font-weight:bold; }
+    select, input[type=text], input[type=number] { width:100%; padding:8px; margin-top:6px; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-bottom:16px; }
+    button { margin-top:12px; padding:10px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#5568d3; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='subjects' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+
+    <main class="content">
+  <h1>Manage Subjects by Semester</h1>
+  {% include 'partials/back_to_dashboard.html' %}
+  <p>Select a branch and semester to view existing subjects and add new ones.</p>
+
+  {% if message %}
+    <div class="message">{{ message }}</div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="message" style="background:#fee; border-color:#f99;">
+      <b>Some rows had issues:</b>
+      <ul style="margin:8px 0 0 18px;">
+        {% for e in errors %}
+          <li>{{ e }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="grid">
+    <div class="card">
+      <h2>Subject List</h2>
+      <form method="get">
+        <label>Branch</label>
+        <select name="branch" required>
+          <option value="">-- Select Branch --</option>
+          {% for b in branches %}
+            <option value="{{ b.id }}" {% if b.id|stringformat:'s' == selected_branch_id %}selected{% endif %}>{{ b.selection_label }}</option>
+          {% endfor %}
+        </select>
+        <label>Semester</label>
+        <select name="semester" required>
+          <option value="">-- Select Semester --</option>
+          {% for s in semesters %}
+            <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_semester_id %}selected{% endif %}>{{ s.number }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Load Subjects</button>
+      </form>
+
+      {% if subjects %}
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Credit</th>
+              <th>Elective</th>
+              <th>Group</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subj in subjects %}
+              <tr>
+                <td>{{ subj.code }}</td>
+                <td>{{ subj.name }}</td>
+                <td>{{ subj.credit }}</td>
+                <td>{% if subj.is_elective %}Yes{% else %}No{% endif %}</td>
+                <td>{{ subj.elective_group|default:"-" }}</td>
+                <td style="white-space:nowrap;">
+                  <a href="{% url 'edit_subject' subj.id %}" style="margin-right:8px; text-decoration:none; color:#2563eb;">Edit</a>
+                  <a href="{% url 'delete_subject' subj.id %}" style="text-decoration:none; color:#e74c3c;">Delete</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No subjects loaded. Select branch and semester.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Bulk Add Subjects</h2>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="bulk_add">
+        <input type="hidden" name="row_count" value="{{ row_count }}">
+        <label>Branch</label>
+        <select name="branch" required>
+          <option value="">-- Select Branch --</option>
+          {% for b in branches %}
+            <option value="{{ b.id }}" {% if b.id|stringformat:'s' == selected_branch_id %}selected{% endif %}>{{ b.selection_label }}</option>
+          {% endfor %}
+        </select>
+        <label>Semester</label>
+        <select name="semester" required>
+          <option value="">-- Select Semester --</option>
+          {% for s in semesters %}
+            <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_semester_id %}selected{% endif %}>{{ s.number }}</option>
+          {% endfor %}
+        </select>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:18%">Code</th>
+              <th style="width:42%">Name</th>
+              <th style="width:18%">Credit</th>
+              <th style="width:12%">Elective</th>
+              <th style="width:18%">Group</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in row_indexes %}
+              <tr>
+                <td><input type="text" name="code_{{ i }}" placeholder="e.g., CS301"></td>
+                <td><input type="text" name="name_{{ i }}" placeholder="e.g., Data Structures"></td>
+                <td><input type="number" name="credit_{{ i }}" min="0" step="0.01" placeholder="0.00"></td>
+                <td style="text-align:center;"><input type="checkbox" name="elective_{{ i }}"></td>
+                <td><input type="text" name="group_{{ i }}" placeholder="ELECTIVE-I"></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit">Save Subjects</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px;">
+    <h2>Bulk Move Subjects</h2>
+    <p style="color:#555; margin-top:4px;">Use this if you selected the wrong branch/semester for a group of subjects.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="bulk_move">
+      <div class="grid" style="grid-template-columns: 1fr 1fr; gap:16px;">
+        <div>
+          <label>From Branch</label>
+          <select name="from_branch" required>
+            <option value="">-- Select Branch --</option>
+            {% for b in branches %}
+              <option value="{{ b.id }}" {% if b.id|stringformat:'s' == selected_branch_id %}selected{% endif %}>{{ b.selection_label }}</option>
+            {% endfor %}
+          </select>
+          <label>From Semester</label>
+          <select name="from_semester" required>
+            <option value="">-- Select Semester --</option>
+            {% for s in semesters %}
+              <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_semester_id %}selected{% endif %}>{{ s.number }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>To Branch</label>
+          <select name="to_branch" required>
+            <option value="">-- Select Branch --</option>
+            {% for b in branches %}
+              <option value="{{ b.id }}">{{ b.selection_label }}</option>
+            {% endfor %}
+          </select>
+          <label>To Semester</label>
+          <select name="to_semester" required>
+            <option value="">-- Select Semester --</option>
+            {% for s in semesters %}
+              <option value="{{ s.id }}">{{ s.number }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <button type="submit" style="background:#e67e22;">Move Subjects</button>
+    </form>
+  </div>
+
+    </main>
+  </div>
+</body>
+</html>

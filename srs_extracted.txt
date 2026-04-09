@@ -1,0 +1,1056 @@
+Campus Academic Management and Planning System (CAMPS) 
+1 
+ 
+ 
+  
+ 
+ 
+  
+ 1.Introduction 
+1.1. Introduction 
+1.2. Scope 
+1.3. Project summary and Purpose 
+1.4. Overview of the project 
+1.5. Problem definition 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+2 
+1.1 Introduction 
+In modern educational institutions, the management of academic and examination -related 
+activities has become increasingly complex due to the growing number of students, subjects, 
+examinations, and administrative processes. Traditional methods such as manual  record 
+keeping and spreadsheet-based systems (e.g., Excel) are prone to errors, data redundancy, lack 
+of security, and inefficiency. Faculty members often spend significant time performing 
+repetitive administrative tasks such as attendance calculation, ma rks aggregation, and exam 
+seating preparation, which reduces their focus on teaching and academic quality. 
+The Academic & Examination Management System  is a web-based application developed 
+to automate and streamline core academic operations including student management, 
+attendance tracking, marks management, and examination seating arrangement. The system is 
+specifically designed for use by faculty members and exam cell administrators, ensuring secure 
+and role-based access to sensitive academic data. By centralizing all academic records into a 
+single system, the application improves accuracy, efficiency, transparency, and reliability. 
+This Software Requirements Specification (SRS) document provides a complete and detailed 
+description of the system’s functional and non -functional requirements, system constraints, 
+design considerations, and operational environment. The document serves as a reference for 
+developers, project evaluators, and future maintainers of the system. 
+1.2 Scope 
+The scope of the Academic & Examination Management System is limited to internal academic 
+operations of an educational institution. The system is designed to be used only by authorized 
+users such as Exam Cell Administrators and Faculty Members. Students do not have direct 
+access to the system. 
+The system covers the following major functionalities: 
+• Role-based authentication for admin and faculty 
+• Semester-wise student data management 
+• Subject-wise attendance marking 
+• Internal and external marks management 
+• Automated grade and result calculation 
+
+Campus Academic Management and Planning System (CAMPS) 
+3 
+• Smart examination seating allocation 
+• Generation of print-ready PDF reports 
+• Centralized student profile with academic summary 
+The system does not include online examinations, fee management, student self-service portals, 
+or AI -based analytics. It focuses on providing a simple, secure, and efficient academic 
+management solution suitable for small to medium-sized educational institutions. 
+1.3 Project Summary and Purpose 
+The primary purpose of this project is to design and implement a reliable academic 
+management platform that reduces manual workload and minimizes human errors in academic 
+record handling. The project aims to replace scattered spreadsheets and manual regist ers with 
+a centralized database-driven system. 
+Key objectives of the project include: 
+• Improving efficiency in attendance and marks management 
+• Ensuring data accuracy through automated calculations 
+• Enhancing security through role-based access control 
+• Simplifying exam seating allocation using algorithmic logic 
+• Providing a student-centric academic overview 
+The project is developed as a final-year (8th semester) Computer Science Engineering project 
+and demonstrates practical application of software engineering principles, database design, and 
+web application development using Django. 
+1.4 Overview of the Project 
+The Academic & Examination Management System is implemented as a web application 
+using the Django framework. The system follows a modular architecture, separating concerns 
+such as authentication, data management, and business logic. 
+Administrators can manage students, configure exam seating, and monitor overall system 
+activity. Faculty members can mark attendance, enter marks, and view student profiles 
+
+Campus Academic Management and Planning System (CAMPS) 
+4 
+related to their assigned subjects. The system automatically calculates attendance 
+percentages, total marks, grades, and pass/fail status, eliminating manual computation errors. 
+A unique feature of the system is the comprehensive student profile page, which presents 
+attendance summaries, marks details, grades, and exam seating information on a single 
+screen. This design improves usability and provides a clear academic overview for faculty 
+and administrators. 
+1.5 Problem Definition 
+Existing academic management practices in many institutions rely heavily on manual processes 
+or spreadsheet-based systems. These approaches suffer from several limitations: 
+• High probability of calculation errors 
+• Lack of centralized data storage 
+• No proper access control or security 
+• Difficulty in tracking historical records 
+• Time-consuming exam seating arrangement 
+• Inconsistent report formats 
+The problem addressed by this project is the absence of a secure, centralized, and efficient 
+system that integrates attendance, marks, and examination management into a single platform. 
+The Academic & Examination Management System aims to solve these issues by providing an 
+automated, role -based, and user -friendly solution tailored to faculty and examination cell 
+workflows. 
+ 
+ 
+ 
+ 
+ 
+ 
+
+Campus Academic Management and Planning System (CAMPS) 
+5 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+2. Technology and Literature Review 
+2.1  About Tools and Technology 
+2.2  Brief History of Work Done 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+6 
+2.1 About Tools and Technology 
+The Academic & Examination Management System is developed using modern, open -source 
+technologies that are widely adopted in academic and enterprise environments. The selection 
+of tools and technologies was based on factors such as reliability, ease of deve lopment, 
+scalability, security, and community support. 
+2.1.1 Python Programming Language 
+Python is a high-level, interpreted programming language known for its simplicity, readability, 
+and extensive library support. It enables rapid development and easy maintenance of 
+applications. Python is widely used in academic institutions for teaching and research, making 
+it a suitable choice for this project. Its clean syntax reduces development complexity and helps 
+in implementing business logic efficiently. 
+2.1.2 Django Web Framework 
+Django is a high-level Python web framework that follows the Model-View-Template (MVT) 
+architectural pattern. It provides built -in features such as authentication, URL routing, form 
+handling, and database abstraction through Object Relational Mapping (ORM). Django ensures 
+strong security by default, offering protection against common web vulnerabilities such as SQL 
+injection, cross-site scripting (XSS), and cross-site request forgery (CSRF). 
+In this project, Django is used to manage user authentication, role -based access control, 
+database operations, and server -side business logic. Its structured approach promotes clean 
+code organization and maintainability. 
+2.1.3 Front-End Technologies (HTML and CSS) 
+HTML (HyperText Markup Language) is used to structure the web pages, while CSS 
+(Cascading Style Sheets) is used for styling and layout. The system follows a minimal and 
+clean user interface design to ensure ease of use for faculty and administrators. The focus is on 
+usability rather than complex visual effects, allowing users to perform tasks quickly and 
+efficiently. 
+2.1.4 Database Technology (SQLite) 
+SQLite is used as the primary database during development due to its lightweight nature and 
+ease of configuration. It stores data in a single file and does not require a separate database 
+
+Campus Academic Management and Planning System (CAMPS) 
+7 
+server. SQLite is suitable for academic projects and small to medium -scale applications. The 
+system design also supports migration to enterprise -level databases such as PostgreSQL for 
+production deployment. 
+2.1.5 PDF Generation Tools 
+The system uses Python -based PDF generation libraries to create professional, print -ready 
+documents such as examination seating arrangements and student lists. These PDFs follow 
+institution-friendly formats and are optimized for A4 printing, ensuring consi stency and 
+readability. 
+2.1.6 File Upload and Data Processing Libraries 
+Libraries such as openpyxl and pandas are used for processing Excel and CSV files. These 
+libraries allow efficient reading, validation, and storage of student data uploaded by 
+administrators. Automated data validation helps prevent incorrect or incomplete records from 
+being inserted into the database. 
+2.2 Brief History of Work Done 
+Academic management systems have evolved significantly over time. Initially, institutions 
+relied entirely on manual record -keeping methods using registers and paper files. Attendance 
+was marked manually, marks were calculated by hand, and examination seati ng was prepared 
+using physical charts. These methods were time -consuming, error -prone, and difficult to 
+maintain. 
+With the introduction of computers, spreadsheet software such as Microsoft Excel became 
+popular for managing academic data. While spreadsheets reduced manual calculations, they 
+introduced new challenges such as data duplication, accidental overwriting, lac k of access 
+control, and difficulty in handling concurrent users. Spreadsheet-based systems also lack audit 
+trails and role-based security, which are essential for academic integrity. 
+As web technologies matured, many institutions adopted web -based academic management 
+systems. Early systems focused primarily on student information storage, while modern 
+systems integrate attendance, marks, examination management, and reporting. However, many 
+existing systems are either overly complex, expensive, or not tailored to faculty workflows. 
+
+Campus Academic Management and Planning System (CAMPS) 
+8 
+This project builds upon existing concepts of academic management systems while addressing 
+their limitations. It emphasizes simplicity, speed, and usability, particularly for faculty 
+members. By using a centralized database, automated calculations, and rol e-based access 
+control, the system offers a reliable alternative to traditional and spreadsheet-based approaches. 
+The Academic & Examination Management System developed in this project represents a 
+balanced solution that combines essential features with minimal complexity, making it suitable 
+for educational institutions and academic environments. 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+9 
+ 
+ 
+ 
+ 
+  
+ 
+    3. System Requirement Study 
+3.1 User Characteristics 
+3.2 Hardware and Software Requirement 
+3.3    Constraints 
+3.2.1 Regulatory Policies 
+3.2.2 Hardware Limitations 
+3.2.3 Interfaces to Other Applications 
+3.2.4 Parallel Operations 
+3.2.5 Higher Order Language Requirements 
+3.2.6 Reliability Requirements 
+3.2.7 Criticality of the Application 
+3.2.8 Safety and Security Consideration 
+3.4 Assumptions and Dependencies 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+10 
+3.1 User Characteristics 
+The Campus Academic Management and Planning System (CAMPS)  is designed for 
+controlled usage within an academic institution. The system is accessed only by authorized 
+personnel, and each category of user has clearly defined roles, responsibilities, and access 
+privileges. Understanding user characteristics is essential for designing a secure, efficient, and 
+user-friendly system. 
+CAMPS follows a role-based access control model , ensuring that users can access only the 
+features relevant to their responsibilities. 
+ 
+3.1.1 Administrator (Exam Cell) 
+Administrators represent the Examination Cell or Academic Administration Department  
+of the institution. They are responsible for managing critical academic data and coordinating 
+examination-related activities. 
+Characteristics of Administrator users: 
+• Possess good understanding of academic and examination workflows 
+• Have basic to intermediate computer proficiency 
+• Authorized to manage student records, subjects, and examination seating 
+• Perform high-impact operations such as exam seating generation 
+• Require secure and reliable system access 
+• Use the system periodically rather than daily 
+Administrators have full system privileges , allowing them to configure and supervise 
+academic operations. 
+ 
+3.1.2 Faculty Members 
+Faculty members are the primary operational users of CAMPS. They interact with the system 
+regularly for academic activities related to teaching and evaluation. 
+
+Campus Academic Management and Planning System (CAMPS) 
+11 
+Characteristics of Faculty users: 
+• Moderate computer and web application proficiency 
+• Frequent system usage during academic sessions 
+• Responsible for marking attendance and entering marks 
+• Access restricted only to their assigned subjects and semesters 
+• Require fast, simple, and error-free user interfaces 
+The system is designed with a faculty-first approach , minimizing clicks and automating 
+calculations to reduce workload. 
+ 
+3.1.3 Students 
+Students do not have direct access to the CAMPS system. All student-related data is managed 
+exclusively by administrators and faculty members. 
+Rationale for restricting student access: 
+• Prevents unauthorized data modification 
+• Ensures academic data integrity 
+• Maintains institutional control over evaluation records 
+• Reduces security risks 
+Student information is available to authorized users through a read-only student profile view, 
+ensuring transparency without compromising security. 
+3.2 Hardware and Software Requirements 
+Hardware Requirements: 
+CAMPS does not require specialized hardware and can operate on standard institutional 
+computing systems. 
+Minimum hardware requirements: 
+• Processor: Intel Core i3 or equivalent 
+• RAM: 4 GB 
+• Storage: 20 GB free disk space 
+
+Campus Academic Management and Planning System (CAMPS) 
+12 
+• Display: 1366 × 768 resolution or higher 
+Recommended hardware requirements: 
+• Processor: Intel Core i5 or higher 
+• RAM: 8 GB or more 
+• Solid State Drive (SSD) for better performance 
+Software Requirements: 
+The software requirements for CAMPS are as follows: 
+• Operating System: Windows, Linux, or macOS 
+• Programming Language: Python 3.9 or higher 
+• Web Framework: Django 5.2 
+• Database: SQLite (development), PostgreSQL (production recommended) 
+• Web Browser: Google Chrome, Mozilla Firefox, Microsoft Edge 
+3.3 Constraints 
+The system is developed under the following constraints: 
+• Internet connectivity is required to access the system 
+• Students are not allowed to log in 
+• The system is designed for small to medium-sized institutions 
+• Performance depends on server configuration and network conditions 
+• Report formats are fixed to institutional standards 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+13 
+3.3.1 Regulatory Policies 
+CAMPS follows institutional academic policies and basic data protection guidelines. User 
+authentication and authorization are enforced using role -based access control. Passwords are 
+securely stored using hashing mechanisms provided by the Django framework. 
+The system does not store unnecessary personal data and avoids unauthorized third -party 
+integrations. 
+3.3.2 Hardware Limitations 
+• Being a web-based system, CAMPS performance is influenced by server hardware and 
+network speed. On low -end systems, operations such as bulk data uploads and PDF 
+generation may experience delays. However, optimized database queries ensure 
+acceptable performance under normal workloads. 
+3.3.3 Interfaces to Other Applications 
+• CAMPS interfaces with the following external components: 
+• Web browsers for user interaction 
+• File systems for Excel and CSV uploads 
+• PDF viewers for viewing and printing reports 
+• The system does not rely on external APIs or third-party academic platforms. 
+3.3.4 Parallel Operations 
+• The system supports multiple users accessing it simultaneously. Faculty members can 
+mark attendance and enter marks concurrently. Django’s session management and 
+database transaction handling ensure data consistency and prevent conflicts during 
+parallel operations. 
+3.3.5 Higher Order Language Requirements 
+CAMPS is developed using Python, a high -level programming language that supports rapid 
+development and easy maintenance. Django’s Object Relational Mapping (ORM) abstracts 
+low-level database operations, enabling developers to focus on business logic rather  than 
+database-specific syntax. 
+3.3.6 Reliability Requirements 
+
+Campus Academic Management and Planning System (CAMPS) 
+14 
+The system is expected to operate reliably during academic sessions. Data integrity is 
+maintained through database constraints, validations, and controlled transactions. Regular 
+database backups are recommended to prevent data loss. 
+3.3.7 Criticality of the Application 
+CAMPS manages critical academic data such as attendance records, marks, and examination 
+seating. Any error or data loss could directly affect student evaluation and institutional 
+credibility. Therefore, accuracy, reliability, and security are treated as hi gh-priority 
+requirements. 
+3.3.8 Safety and Security Considerations 
+Security is a core requirement of CAMPS. The system implements: 
+• Role-based authentication 
+• Session-based access control 
+• CSRF protection for all forms 
+• Restricted access to sensitive operations 
+Marks submission and examination seating operations are protected using confirmation and 
+locking mechanisms. 
+3.4 Assumptions and Dependencies 
+• Assumptions: 
+• Users have valid credentials and basic system knowledge. 
+• Academic processes follow a semester-based structure. 
+• The system is deployed on a properly configured server 
+• Dependencies: 
+• Python runtime environment 
+• Django framework 
+• Supported web browsers 
+ 
+ 
+ 
+
+Campus Academic Management and Planning System (CAMPS) 
+15 
+ 
+ 
+ 
+ 
+ 
+4.  System Diagrams 
+4.1 Study of Current System 
+4.2  Problem and Weaknesses of Current System 
+4.3 Requirements of New System 
+4.3.1 User Requirements 
+4.3.2 System Requirements 
+4.4 Feasibility Study  
+4.4.1 Contribution to Organizational Objectives 
+4.4.2 Implementation Feasibility 
+4.4.3 Integration with Existing Systems 
+4.5 Requirements Validation 
+4.6 Activity/Process In New System(Use event table) 
+4.7 Features Of New System 
+4.8 Class Diagram 
+4.9 System Activity(Use case and/or scenario diagram) 
+4.10 Object Interaction 
+4.11 Sequence and Collaboration Diagram 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+16 
+4.1 Study of Current System 
+The current academic and examination management process in many educational institutions 
+is largely manual or semi-automated using spreadsheet tools such as Microsoft Excel. Student 
+attendance is maintained in registers or Excel sheets, marks are calculate d manually, and 
+examination seating arrangements are prepared using handwritten charts or spreadsheets. 
+These systems operate independently without centralized control. Data is stored across multiple 
+files and devices, making retrieval, updating, and verification difficult. Faculty members often 
+maintain their own records, leading to inconsistency and duplication of data. 
+4.2 Problems and Weaknesses of Current System 
+The existing system suffers from several drawbacks: 
+• High probability of human errors in attendance and marks calculation 
+• No centralized database for academic records 
+• Lack of role-based access control and security 
+• Time-consuming manual processes 
+• Difficulty in tracking historical academic data 
+• No audit trail for data modifications 
+• Manual exam seating allocation is inefficient and error-prone 
+• Inconsistent report formats 
+These issues directly affect efficiency, data accuracy, and academic transparency. 
+4.3 Requirements of New System 
+The proposed system, CAMPS, is designed to overcome the limitations of the existing system 
+by providing an automated, secure, and centralized academic management platform. 
+4.3.1 User Requirements 
+The system must: 
+• Allow only authorized users to access the system 
+• Provide role-based dashboards for administrators and faculty 
+• Enable fast attendance marking and marks entry 
+• Automatically calculate attendance percentages, totals, and grades 
+
+Campus Academic Management and Planning System (CAMPS) 
+17 
+• Generate professional PDF reports 
+• Provide a comprehensive student academic profile 
+4.3.2 System Requirements 
+Functional Requirements: 
+• The system shall allow only authorized users to log in. 
+• The system shall support role-based authentication for Administrator and Faculty. 
+• The system shall redirect users to their respective dashboards after login. 
+• The system shall provide secure logout functionality. 
+• The system shall restrict access based on user roles. 
+• The system shall prevent students from logging into the system. 
+• The system shall allow administrators to add student records. 
+• The system shall allow administrators to edit student records. 
+• The system shall allow administrators to delete student records. 
+• The system shall store student academic information semester-wise. 
+• The system shall support searching and filtering of student records. 
+• The system shall allow bulk upload of student data using Excel or CSV files. 
+• The system shall allow faculty to mark attendance subject-wise. 
+• The system shall mark all students present by default. 
+• The system shall allow faculty to mark absentees easily. 
+• The system shall prevent duplicate attendance entries. 
+• The system shall automatically calculate attendance percentages. 
+• The system shall allow faculty to enter internal marks. 
+• The system shall allow faculty to enter external marks. 
+• The system shall automatically calculate total marks. 
+• The system shall assign grades based on predefined rules. 
+• The system shall determine pass/fail status automatically. 
+• The system shall allow saving marks in draft mode. 
+• The system shall lock marks after final submission. 
+• The system shall allow administrators to generate exam seating arrangements. 
+• The system shall assign exam numbers and seat numbers automatically. 
+• The system shall distribute students evenly across examination rooms. 
+• The system shall generate print-ready PDF reports. 
+• The system shall display a comprehensive student profile. 
+
+Campus Academic Management and Planning System (CAMPS) 
+18 
+• The system shall show attendance, marks, grades, and seating details. 
+• The system shall maintain an audit trail for academic actions. 
+Non-Functional Requirements: 
+• The system shall provide fast response time for user actions. 
+• The system shall support concurrent access by multiple users. 
+• The system shall ensure data accuracy and consistency. 
+• The system shall store passwords using secure hashing techniques. 
+• The system shall protect against unauthorized access. 
+• The system shall implement CSRF protection for all forms. 
+• The system shall be reliable during academic sessions. 
+• The system shall minimize system downtime. 
+• The system shall provide a user-friendly interface. 
+• The system shall require minimal training for users. 
+• The system shall be scalable for future growth. 
+• The system shall be easy to maintain and update. 
+• The system shall follow modular and structured design. 
+• The system shall be portable across operating systems. 
+• The system shall work on standard web browsers. 
+• The system shall support regular data backups. 
+4.4 Feasibility Study 
+• Technical Feasibility: Feasible with Python, Scapy, and SQLite on modern hardware. 
+• Economic Feasibility: Open-source tools reduce costs; minimal hardware requirements. 
+• Operational Feasibility: Easy to deploy and use for administrators with basic skills. 
+• Schedule Feasibility: Can be developed within a semester (3-4 months). 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+19 
+4.4.1 Contribution to Organizational Objectives 
+CAMPS contributes to institutional objectives by: 
+• Improving academic efficiency 
+• Reducing administrative workload 
+• Enhancing data accuracy and transparency 
+• Supporting structured academic planning 
+4.4.2 Implementation Feasibility 
+The system is feasible to implement because: 
+• Open-source technologies are used 
+• Development cost is minimal 
+• Required technical skills are available 
+• System complexity is manageable 
+4.4.3 Integration with Existing Systems 
+CAMPS can coexist with existing academic processes during transition. Student data can be 
+imported using Excel or CSV files, allowing gradual migration without disrupting operati 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+20 
+4.5 Requirements Validation 
+Requirements validation ensures that the system meets user expectations. Validation is 
+performed through: 
+• Requirement reviews 
+• Functional testing 
+• Faculty feedback 
+• Verification of outputs such as reports and calculations 
+This process ensures that the system fulfills its intended purpose. 
+4.6 Activity/Process in New System 
+Table-1: Event Table 
+Event Actor Description Outcome 
+Login Admin / Faculty User enters credentials Dashboard displayed 
+Add Student Admin Student details added Record saved 
+Mark Attendance Faculty Attendance marked Percentage calculated 
+Enter Marks Faculty Marks entered Grades generated 
+Generate Seating Admin Seating allocated PDF generated 
+Event Trigger Response Output 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+21 
+4.7 Features of New System 
+Key features of CAMPS include: 
+• Role-based authentication 
+• Semester-wise student management 
+• One-page student profile 
+• Fast attendance marking 
+• Automated marks and grade calculation 
+• Smart exam seating allocation 
+• Print-ready PDF reports 
+• Secure and reliable data handling 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+22 
+4.8 Class Diagram 
+Fig. 1: Class Diagram 
+
+
+Campus Academic Management and Planning System (CAMPS) 
+23 
+4.9 System Activity (Use Case Diagram) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig. 2: Use Case Diagram 
+ 
+
+
+Campus Academic Management and Planning System (CAMPS) 
+24 
+4.10 Object Interaction 
+• Packet → AlertManager: Packets are processed by process_packet(), triggering 
+insert_alert() if thresholds are met. 
+• AlertManager → Dashboard: Alerts are fetched via fetch_alerts() and displayed on the 
+Streamlit dashboard. 
+• Dashboard → AlertManager: Admin actions (e.g., update status, ignore IP) call 
+update_alert_status(), ignore_ip(), or insert_log(). 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+25 
+4.11 Sequence and Collaboration Diagram 
+ 
+ 
+ 
+Fig. 3: Sequence and Collaboration Diagram 
+   
+
+
+Campus Academic Management and Planning System (CAMPS) 
+26 
+ 
+ 
+ 
+ 
+ 
+  
+5. System Design 
+5.1 System Application Design 
+5.1.1  Method Pseudo code 
+5.2  Database Design/Data Structure Design 
+5.2.1 Table and Relationship 
+5.2.2 Logical Description Of Data 
+5.3  Input/output and Interface Design 
+5.3.1 State Transition/UML Diagram 
+5.3.2 Samples Of Forms, Reports and Interface  
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+27 
+5.1 System Application Design 
+CAMPS follows a web-based, layered architecture using the Django framework. The system 
+is divided into multiple logical layers to ensure separation of concerns and ease of maintenance. 
+The system architecture consists of the following layers: 
+• Presentation Layer 
+o Handles user interaction through web pages 
+o Implemented using HTML and CSS 
+o Displays forms, dashboards, and reports 
+• Application Logic Layer 
+o Contains business logic and validation rules 
+o Implemented using Django views and forms 
+o Controls attendance marking, marks calculation, and exam seating logic 
+• Data Access Layer 
+o Manages database operations 
+o Implemented using Django ORM 
+o Ensures secure and efficient data storage and retrieval 
+• Database Layer 
+o Stores all academic and examination data 
+o Uses SQLite for development and testing 
+This layered approach improves modularity and simplifies future enhancements. 
+5.1.1 Method Pseudo Code (Detect Brute Force Attack): 
+Pseudocode for Attendance Marking 
+START 
+Select Subject 
+Select Date 
+Load enrolled students 
+Mark all students as PRESENT 
+For each absent student selected: 
+    Update status to ABSENT 
+Save attendance record 
+Calculate attendance percentage 
+
+Campus Academic Management and Planning System (CAMPS) 
+28 
+END 
+ 
+Pseudocode for Marks Entry 
+START 
+Select Subject 
+Load enrolled students 
+Enter internal marks 
+Enter external marks 
+Calculate total marks 
+Assign grade 
+If faculty submits: 
+    Lock marks 
+END 
+ 
+Pseudocode for Examination Seating Allocation 
+START 
+Input total students and room details 
+Assign preferred number of students to each room 
+Distribute remaining students 
+Generate seating list 
+Create PDF report 
+END 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+29 
+5.2 Database Design/Data Structure  
+The database design defines how data is stored, organized, and related within CAMPS. A 
+relational database model is used to ensure data integrity and avoid redundancy. 
+5.2.1 Table and Relationship 
+Table 2: Student Table 
+Field Name Data Type Description 
+student_id Integer Unique student ID 
+enrollment_no Varchar Enrollment number 
+roll_no Varchar Roll number 
+first_name Varchar Student first name 
+last_name Varchar Student last name 
+email Varchar Student email 
+branch Varchar Branch name 
+semester Integer Current semester 
+admission_year Integer Year of admission 
+status Varchar Academic status 
+ 
+Table 3: Faculty Table 
+Field Name Data Type Description 
+faculty_id Integer Unique faculty ID 
+first_name Varchar Faculty first name 
+last_name Varchar Faculty last name 
+email Varchar Faculty email 
+contact_no Varchar Contact number 
+department Varchar Department name 
+designation Varchar Faculty designation 
+username Varchar Login username 
+password Varchar Encrypted password 
+
+Campus Academic Management and Planning System (CAMPS) 
+30 
+Table 4: Subject Table 
+Field Name Data Type Description 
+subject_id Integer Unique subject ID 
+subject_code Varchar Subject code 
+subject_name Varchar Subject name 
+semester Integer Semester 
+branch Varchar Branch 
+faculty_id Integer Assigned faculty 
+credits Integer Credit value 
+ 
+Table 5: Attendance Table 
+Field Name Data Type Description 
+attendance_id Integer Unique attendance record 
+student_id Integer Student reference 
+subject_id Integer Subject reference 
+date Date Attendance date 
+status Varchar Present / Absent 
+semester Integer Semester 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+31 
+Table 6: Marks Table 
+Field Name Data Type Description 
+marks_id Integer Unique marks record 
+student_id Integer Student reference 
+subject_id Integer Subject reference 
+internal_marks Integer Internal marks 
+external_marks Integer External marks 
+total_marks Integer Total marks 
+grade Varchar Grade 
+result_status Varchar Pass / Fail 
+submission_status Varchar Draft / Final 
+ 
+Table 7: Seating Table 
+Field Name Data Type Description 
+seating_id Integer Unique seating record 
+student_id Integer Student reference 
+subject_id Integer Subject reference 
+exam_date Date Exam date 
+room_no Varchar Room number 
+seat_no Varchar Seat number 
+exam_number Varchar Exam seat number 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+32 
+Relationships: 
+• One Faculty → Many Subjects 
+• One Subject → Many Students 
+• One Student → Many Attendance Records 
+• One Student → Many Marks Records 
+• One Student → One Exam Seating per subject 
+5.2.2 Logical Description of Data 
+• Student table stores personal and academic identifiers 
+• Subject table stores subject and semester details 
+• Attendance table records daily attendance status 
+• Marks table stores internal, external, and total marks 
+• Seating table stores examination room and seat information 
+All tables use primary and foreign keys to maintain referential integrity. 
+5.3 Input/Output and Interface Design 
+Inputs: 
+• Network packets (TCP) captured via Scapy. 
+• Admin inputs via Streamlit (login credentials, status updates, IP management). 
+Outputs: 
+• Alerts stored in alerts table. 
+• Logs stored in logs table. 
+• Dashboard displays (tables, charts, notifications). 
+• CSV files for exported alerts. 
+Interface Design: 
+• Streamlit dashboard with: 
+• Login page with username/password fields. 
+• Alerts page with filterable table (timestamp, src_ip, attack_type, message, 
+status). 
+• Visualization page with bar, line, and pie charts. 
+
+Campus Academic Management and Planning System (CAMPS) 
+33 
+• Logs page with admin activity table. 
+• Ignored IPs page for managing IPs. 
+5.3.1 State Transition 
+The system transitions through different states based on user actions: 
+• Logged Out → Logged In 
+• Dashboard → Attendance / Marks / Seating 
+• Draft State → Final Submission State 
+• Editable State → Locked State 
+These transitions ensure controlled access and prevent unauthorized modifications. 
+Fig. 5: State Transition Diagram for Alert Status 
+  
+ 
+ 
+ 
+
+
+Campus Academic Management and Planning System (CAMPS) 
+34 
+5.8 Samples of Forms, Reports, and Interface 
+The system provides the following interfaces: 
+• Login Form – Secure authentication 
+• Admin Dashboard – Student and exam management 
+• Faculty Dashboard – Attendance and marks entry 
+• Attendance Form – Subject-wise attendance marking 
+• Marks Entry Form – Internal and external marks input 
+• Student Profile Page – Consolidated academic view 
+• Examination Seating Report – PDF output for printing 
+• Attendance Report for Exam – Generates a student list for attendance and sign. 
+The interface design focuses on simplicity, clarity, and minimal user effort. 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+35 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+6. System Testing 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+Campus Academic Management and Planning System (CAMPS) 
+36 
+Table-5: Test Cases 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+Test Case 
+ID 
+Module Test 
+Description 
+Input Expected Result Status 
+TC-01 Login Valid login Correct 
+credentials 
+Dashboard displayed Pass 
+TC-02 Login Invalid login Wrong password Error message 
+shown 
+Pass 
+TC-03 Student Add new 
+student 
+Valid student data Record saved Pass 
+TC-04 Attendance Mark 
+attendance 
+Select subject & 
+date 
+Attendance stored Pass 
+TC-05 Marks Enter marks Valid marks Total & grade 
+calculated 
+Pass 
+TC-06 Seating Generate 
+seating 
+Room capacity 
+input 
+Seating PDF 
+generated 
+Pass 
+TC-07 Seating Attendance 
+Report 
+Seating and 
+student data 
+Student list with 
+enrollment no for 
+Examination 
+attendance 
+Pass 
+
+Campus Academic Management and Planning System (CAMPS) 
+37 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+7. Conclusion  
+
+Campus Academic Management and Planning System (CAMPS) 
+38 
+The Campus Academic Management and Planning System (CAMPS) has been 
+successfully designed and developed to automate and streamline academic and examination-
+related activities within an educational institution. The system effectively replaces manual 
+and spreadsheet-based workflows with a centralized, secure, and efficient web-based 
+solution. 
+CAMPS provides role-based access for administrators and faculty members, ensuring that 
+sensitive academic data is handled securely. Core functionalities such as student 
+management, attendance tracking, marks entry, grade calculation, and examination seating 
+allocation are integrated into a single unified platform. Automated calculations reduce human 
+error, while draft-and-lock mechanisms prevent accidental modification of finalized academic 
+records. 
+The system demonstrates the practical application of software engineering principles, 
+including requirement analysis, system design, database modeling, UML diagram 
+representation, and structured implementation using Django framework. The layered 
+architecture and modular design ensure maintainability and scalability. 
+Through this project, institutional academic processes become more organized, transparent, 
+and efficient. Faculty workload is reduced, administrative tasks are simplified, and data 
+accuracy is significantly improved. The system fulfills its intended objectives and is ready for 
+deployment in small to medium-sized academic institutions. 
+ 
+Future Enhancements 
+Although CAMPS meets current requirements, the following enhancements can be 
+considered in the future: 
+• Student login portal for viewing attendance and results 
+• SMS/Email notification system 
+• Integration with ERP systems 
+• Advanced analytics and performance reports 
+• Cloud deployment for multi-campus access 
+• Mobile application version 
+These enhancements would further improve usability and scalability.  
+
+Campus Academic Management and Planning System (CAMPS) 
+39 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+8. Bibliography 
+  
+
+Campus Academic Management and Planning System (CAMPS) 
+40 
+The following references were used during the development and documentation of the 
+project: 
+1. Sommerville, Ian. Software Engineering, 10th Edition, Pearson Education. 
+2. Pressman, Roger S. Software Engineering: A Practitioner’s Approach, McGraw-Hill 
+Education. 
+3. Django Software Foundation. Django Documentation. Available at: 
+https://docs.djangoproject.com/ 
+4. Python Software Foundation. Python Documentation. Available at: 
+https://docs.python.org/ 
+5. Gamma, Erich et al. Design Patterns: Elements of Reusable Object-Oriented 
+Software, Addison-Wesley. 
+6. Elmasri, Ramez and Navathe, Shamkant. Fundamentals of Database Systems, Pearson 
+Education. 
+7. W3Schools. HTML and CSS Tutorials. Available at: https://www.w3schools.com/ 
+8. SQLite Documentation. Available at: https://www.sqlite.org/docs.html 
+9. IEEE Standards Association. IEEE Standard for Software Requirements 
+Specifications. 

@@ -1,0 +1,65 @@
+{% load static %}
+<aside class="sidebar" id="sidebar">
+  <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Collapse Sidebar">
+    <span class="close-icon">«</span>
+  </button>
+  <div class="brand">
+    <span class="brand-icon">📚</span>
+    <span class="brand-text">Exam & Academic</span>
+  </div>
+  <div class="profile">
+    <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
+    <div class="role">{% if request.user.is_staff %}Admin{% else %}Faculty{% endif %}</div>
+    <div class="role">{{ request.user.email }}</div>
+  </div>
+  <ul class="nav">
+    <li><a href="{% url 'dashboard' %}" {% if active_page == 'dashboard' %}class="primary"{% endif %} title="Dashboard"><span class="nav-icon">🏠</span><span class="nav-text">Dashboard</span></a></li>
+    <li><a href="{% url 'student_list' %}" {% if active_page == 'students' %}class="primary"{% endif %} title="Students"><span class="nav-icon">👥</span><span class="nav-text">Students</span></a></li>
+    {% if request.user.is_staff %}
+      <li><a href="{% url 'manage_enrollments' %}" {% if active_page == 'enrollments' %}class="primary"{% endif %} title="Enrollments"><span class="nav-icon">📋</span><span class="nav-text">Enrollments</span></a></li>
+      <li><a href="{% url 'manage_subjects' %}" {% if active_page == 'subjects' %}class="primary"{% endif %} title="Subjects"><span class="nav-icon">📖</span><span class="nav-text">Subjects</span></a></li>
+      <li><a href="{% url 'upload_marksheet' %}" {% if active_page == 'marks' %}class="primary"{% endif %} title="Upload Marks"><span class="nav-icon">📊</span><span class="nav-text">Upload Marks</span></a></li>
+      <li><a href="{% url 'manage_notices' %}" {% if active_page == 'notices' %}class="primary"{% endif %} title="Notices"><span class="nav-icon">📢</span><span class="nav-text">Notices</span></a></li>
+      <li><a href="{% url 'manage_roles' %}" {% if active_page == 'roles' %}class="primary"{% endif %} title="Manage Faculty"><span class="nav-icon">👨‍🏫</span><span class="nav-text">Manage Faculty</span></a></li>
+      <li><a href="{% url 'assign_subjects' %}" {% if active_page == 'assign' %}class="primary"{% endif %} title="Faculty Assignments"><span class="nav-icon">📝</span><span class="nav-text">Faculty Assignments</span></a></li>
+    {% else %}
+      <li><a href="{% url 'mark_attendance' %}" {% if active_page == 'attendance' %}class="primary"{% endif %} title="Mark Attendance"><span class="nav-icon">✓</span><span class="nav-text">Mark Attendance</span></a></li>
+      <li><a href="{% url 'marks_entry' %}" {% if active_page == 'marks_entry' %}class="primary"{% endif %} title="Marks Entry"><span class="nav-icon">🧮</span><span class="nav-text">Marks Entry</span></a></li>
+    {% endif %}
+    <li><a href="{% url 'attendance_report' %}" {% if active_page == 'seating' %}class="primary"{% endif %} title="Seating"><span class="nav-icon">💺</span><span class="nav-text">Seating</span></a></li>
+    <li><a href="{% url 'sample_files' %}" {% if active_page == 'samples' %}class="primary"{% endif %} title="Sample Files"><span class="nav-icon">📥</span><span class="nav-text">Sample Files</span></a></li>
+    <li><a href="{% url 'logout' %}" title="Logout"><span class="nav-icon">🚪</span><span class="nav-text">Logout</span></a></li>
+  </ul>
+</aside>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const icon = document.querySelector('.close-icon');
+  if (!sidebar || !icon) return;
+  
+  sidebar.classList.toggle('collapsed');
+  
+  // Update icon direction
+  if (sidebar.classList.contains('collapsed')) {
+    icon.textContent = '»';
+  } else {
+    icon.textContent = '«';
+  }
+  
+  // Save state
+  localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+}
+
+// Restore sidebar state on page load
+(function() {
+  const sidebar = document.getElementById('sidebar');
+  const icon = document.querySelector('.close-icon');
+  const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+  
+  if (isCollapsed && sidebar && icon) {
+    sidebar.classList.add('collapsed');
+    icon.textContent = '»';
+  }
+})();
+</script>

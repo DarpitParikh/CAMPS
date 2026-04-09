@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Profile</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+        
+        .student-header {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .info-item {
+            border-right: 1px solid #ecf0f1;
+            padding-right: 20px;
+        }
+        
+        .info-item:last-child {
+            border-right: none;
+        }
+        
+        .info-label {
+            color: #7f8c8d;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th {
+            background-color: #ecf0f1;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        table tr:hover { background-color: #f9f9f9; }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll.sticky-scrollbar {
+            max-height: 58vh;
+            overflow: auto;
+        }
+
+        .table-scroll table {
+            min-width: 760px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1;
+            transition: background-color 0.2s ease, transform 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-2);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-accent {
+            background: #0ea5e9;
+        }
+
+        .btn-accent:hover {
+            background: #0284c7;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .badge-pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-present {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-absent {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .empty-message {
+            color: #7f8c8d;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .risk-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .risk-high { background: #dc2626; }
+        .risk-medium { background: #d97706; }
+        .risk-low { background: #16a34a; }
+
+        .timeline {
+            border-left: 3px solid #e5e7eb;
+            margin-left: 8px;
+            padding-left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .timeline-item {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .timeline-meta {
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .student-info { grid-template-columns: 1fr; }
+            .info-item { border-right: none; border-bottom: 1px solid #ecf0f1; padding-right: 0; padding-bottom: 15px; }
+            table { font-size: 13px; }
+            table th, table td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='students' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+    
+    <main class="content">
+        <h1>👤 Student Profile</h1>
+        {% include 'partials/back_to_dashboard.html' %}
+        
+        <!-- Student Header -->
+        <div class="student-header">
+            <h2>{{ student.name }}</h2>
+            <div class="student-info">
+                <div class="info-item">
+                    <div class="info-label">Enrollment Number</div>
+                    <div class="info-value">{{ student.enrollment_no }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Branch / Semester / Division</div>
+                    <div class="info-value">{{ student.branch.code }} / S{{ student.semester.number }} / {{ student.division }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mentor Name</div>
+                    <div class="info-value">{{ student.mentor_name|default:"—" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Admission Year</div>
+                    <div class="info-value">{{ student.admission_year|default:"—" }}</div>
+                </div>
+            </div>
+            {% if student.email or student.phone %}
+            <hr style="margin: 15px 0;">
+            <p style="color: #7f8c8d; font-size: 14px;">
+                {% if student.email %}Email: {{ student.email }} | {% endif %}
+                {% if student.phone %}Phone: {{ student.phone }}{% endif %}
+            </p>
+            {% endif %}
+
+            <div style="margin-top: 12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                {% if risk.level == 'HIGH' %}
+                <span class="risk-chip risk-high">Risk: HIGH ({{ risk.score }})</span>
+                {% elif risk.level == 'MEDIUM' %}
+                <span class="risk-chip risk-medium">Risk: MEDIUM ({{ risk.score }})</span>
+                {% else %}
+                <span class="risk-chip risk-low">Risk: LOW ({{ risk.score }})</span>
+                {% endif %}
+                <span class="info-label" style="margin:0;">Attendance: {{ risk.attendance_pct|default:'N/A' }}%</span>
+                <span class="info-label" style="margin:0;">Avg Marks: {{ risk.avg_marks_pct|default:'N/A' }}%</span>
+                <span class="info-label" style="margin:0;">Fail Records: {{ risk.fail_count }}</span>
+            </div>
+        </div>
+        
+        <!-- Attendance Summary -->
+        <div class="section">
+            <h2>📋 Attendance Summary</h2>
+            {% if attendance_summary %}
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Present</th>
+                            <th>Total Classes</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code, data in attendance_summary.items %}
+                        <tr>
+                            <td><strong>{{ code }}</strong></td>
+                            <td>{{ data.present }}</td>
+                            <td>{{ data.total }}</td>
+                            <td>
+                                <strong>{{ data.percentage }}%</strong>
+                                {% if data.percentage >= 75 %}
+                                <span class="badge badge-present">✓ Good</span>
+                                {% else %}
+                                <span class="badge badge-absent">⚠ Low</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-message">No attendance records available</div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>📝 Marks History</h2>
+            <form method="get" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:12px;">
+                <div>
+                    <label class="info-label" style="margin-bottom:4px;">Exam Type</label>
+                    <select name="exam_type" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                        <option value="">All</option>
+                        <option value="MID" {% if selected_exam_type == 'MID' %}selected{% endif %}>Mid Semester</option>
+                        <option value="FINAL" {% if selected_exam_type == 'FINAL' %}selected{% endif %}>Final Exam</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="info-label" style="margin-bottom:4px;">Exam Session</label>
+                    <select name="exam_session" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                        <option value="">All</option>
+                        {% for session in exam_session_options %}
+                        <option value="{{ session }}" {% if selected_exam_session == session %}selected{% endif %}>{{ session }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="info-label" style="margin-bottom:4px;">Attempt</label>
+                    <select name="attempt_no" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                        <option value="">All</option>
+                        {% for attempt in attempt_options %}
+                        <option value="{{ attempt }}" {% if selected_attempt_no == attempt|stringformat:'s' %}selected{% endif %}>Attempt {{ attempt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="btn-group" style="align-items:end;">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a href="{% url 'student_profile' student.id %}" class="btn btn-secondary">Clear</a>
+                </div>
+            </form>
+            <div class="btn-group" style="margin-bottom: 12px;">
+                {% if can_download_marks %}
+                <a href="{% url 'student_marks_download_csv' student.id %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-accent">Download Marks CSV</a>
+                <a href="{% url 'student_marks_download_pdf' student.id %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-primary">Download Marks PDF</a>
+                {% else %}
+                <span style="color:#6b7280; font-size:13px;">Marks download is available only for assigned class mentors.</span>
+                {% endif %}
+            </div>
+            {% if marks_records %}
+            <div class="table-scroll sticky-scrollbar">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Exam Type</th>
+                            <th>Attempt</th>
+                            <th>Semester</th>
+                            <th>Subject</th>
+                            <th>Marks</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in marks_records %}
+                        <tr>
+                            <td>{{ rec.exam_session }}</td>
+                            <td>{{ rec.get_exam_type_display }}</td>
+                            <td>{{ rec.attempt_no }}</td>
+                            <td>{{ rec.semester.number }}</td>
+                            <td>{{ rec.subject.code }} - {{ rec.subject.name }}</td>
+                            <td>
+                                {% if rec.is_absent %}
+                                    AB
+                                {% elif rec.marks_obtained is not None %}
+                                    {{ rec.marks_obtained }} / {{ rec.max_marks }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if rec.is_absent %}
+                                    <span class="badge badge-fail">Absent</span>
+                                {% elif rec.pass_marks and rec.marks_obtained is not None and rec.marks_obtained < rec.pass_marks %}
+                                    <span class="badge badge-fail">Fail</span>
+                                {% elif rec.marks_obtained is not None %}
+                                    <span class="badge badge-pass">Pass</span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-message">No marks records available</div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>🧑‍🏫 Mentor Action Log</h2>
+            {% if can_log_actions %}
+            <form method="post" style="display:grid; grid-template-columns: 220px 1fr auto; gap:10px; margin-bottom:12px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_mentor_action">
+                <select name="action_type" style="padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                    {% for value, label in mentor_action_choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <input name="note" type="text" required placeholder="Add intervention details..." style="padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                <button type="submit" class="btn btn-primary">Add Log</button>
+            </form>
+            {% else %}
+            <div style="margin-bottom:12px; color:#6b7280; font-size:13px;">Only the assigned class mentor can add intervention logs for this student.</div>
+            {% endif %}
+
+            {% if mentor_actions %}
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Note</th>
+                            <th>By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in mentor_actions %}
+                        <tr>
+                            <td>{{ log.created_at|date:'d M Y, h:i A' }}</td>
+                            <td>{{ log.get_action_type_display }}</td>
+                            <td>{{ log.note }}</td>
+                            <td>{{ log.created_by.get_full_name|default:log.created_by.username|default:'System' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-message">No mentor actions logged yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>🕒 Academic Timeline</h2>
+            {% if timeline %}
+            <div class="timeline">
+                {% for item in timeline %}
+                <div class="timeline-item">
+                    <div><strong>{{ item.title }}</strong></div>
+                    <div>{{ item.meta }}</div>
+                    <div class="timeline-meta">{{ item.date|date:'d M Y, h:i A' }} • {{ item.type }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-message">Timeline is empty.</div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>🧾 Marks Audit Trail</h2>
+            {% if marks_audits %}
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Subject</th>
+                            <th>Changed</th>
+                            <th>Reason</th>
+                            <th>By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audit in marks_audits %}
+                        <tr>
+                            <td>{{ audit.changed_at|date:'d M Y, h:i A' }}</td>
+                            <td>{{ audit.subject.code }}</td>
+                            <td>{{ audit.old_marks|default:'-' }} -> {{ audit.new_marks|default:'-' }}{% if audit.new_absent %} (Absent){% endif %}</td>
+                            <td>{{ audit.reason|default:'-' }}</td>
+                            <td>{{ audit.changed_by.get_full_name|default:audit.changed_by.username|default:'System' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-message">No audit entries yet for this student.</div>
+            {% endif %}
+        </div>
+        
+        
+        <!-- Exam Seating Info -->
+        {% if student.exam_no %}
+        <div class="section">
+            <h2>🎫 Exam Seating Information</h2>
+            <div class="table-scroll">
+                <table>
+                    <tr>
+                        <td><strong>Exam Number:</strong></td>
+                        <td>{{ student.exam_no }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Room Number:</strong></td>
+                        <td>{{ student.room_no }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exam Number:</strong></td>
+                        <td>{{ student.exam_no }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if user.is_staff %}
+        <div class="section">
+            <h2>⚠ Admin Actions</h2>
+            <p style="color:#555;">Deleting will remove this student and cascade related attendance, enrollments, and results.</p>
+            <a href="{% url 'delete_student' student.id %}" style="background:#e74c3c; color:white; padding:10px 14px; border-radius:6px; text-decoration:none; display:inline-block;">Delete Student</a>
+        </div>
+        {% endif %}
+    </main>
+  </div>
+</body>
+</html>

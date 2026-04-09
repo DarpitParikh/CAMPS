@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sample Files</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    h1 { margin:0 0 8px 0; color: var(--text); }
+    .note { color:#6b7280; margin-bottom:16px; }
+    .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border:1px solid #eee; padding:10px; text-align:left; }
+    th { background:#f9fafb; }
+    a.download { color: var(--primary); text-decoration: none; font-weight: 600; }
+    a.download:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='samples' %}
+      {% include 'partials/sidebar.html' %}
+    {% endwith %}
+
+    <main class="content">
+      <h1>Sample Upload Files</h1>
+      <p class="note">Use these files as templates so all uploads stay in the correct format.</p>
+
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Upload Type</th>
+              <th>Sample File</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if is_admin %}
+            <tr>
+              <td>Students Upload</td>
+              <td><a class="download" href="{% url 'download_student_upload_sample' %}">Download CSV</a></td>
+              <td>Columns: enrollment_no, name, division, mentor_name, email, phone</td>
+            </tr>
+            <tr>
+              <td>Marks Upload (Flat)</td>
+              <td><a class="download" href="{% url 'download_marks_upload_sample' %}">Download CSV</a></td>
+              <td>One row per course per student</td>
+            </tr>
+            <tr>
+              <td>Marks Upload (Consolidated)</td>
+              <td><a class="download" href="{% url 'download_marks_upload_sample' %}?layout=consolidated">Download XLSX</a></td>
+              <td>University-style sheet with subject GP columns</td>
+            </tr>
+            <tr>
+              <td>Elective Assignments Upload</td>
+              <td><a class="download" href="{% url 'download_elective_upload_sample' %}">Download CSV</a></td>
+              <td>Columns: enrollment_no, elective_group, subject_code</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td>Attendance Seating PDF (Optional)</td>
+              <td><a class="download" href="{% url 'download_seating_pdf_sample' %}">Download PDF</a></td>
+              <td>Numeric room/seat summary format for parser</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

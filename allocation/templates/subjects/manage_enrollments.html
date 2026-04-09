@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+{% load dict_extras %}
+<head>
+  <title>Manage Enrollments</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    h1 { margin:0 0 8px 0; color: var(--text); }
+    .note { color:#555; margin-bottom:16px; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-bottom:16px; }
+    .panel { background:white; border-radius:10px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+    label { font-weight: 600; color: #374151; display:block; margin-bottom:4px; }
+    select { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; min-width:160px; }
+    button { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; }
+    button:hover { background: var(--primary-2); }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border:1px solid #eee; padding:8px 10px; text-align:left; }
+    th { background:#f8f8f8; }
+    .tag { display:inline-block; padding:2px 6px; border-radius:4px; font-size:12px; }
+    .fixed { background:#e6ffe6; border:1px solid #a6d8a6; }
+    .elective { background:#fff5e6; border:1px solid #e6c38f; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='enrollments' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+
+    <main class="content">
+      <h1>Manage Subject Enrollments</h1>
+      <p class="note">Fixed subjects are assigned automatically for the selected branch and semester. Use the dropdowns to pick elective subjects per group.</p>
+
+      {% if message %}
+        <div class="message">{{ message }}</div>
+      {% endif %}
+
+      <div class="panel">
+        <form method="get" class="controls">
+          <div>
+            <label>Branch</label>
+            <select name="branch" required>
+              <option value="">-- Select --</option>
+              {% for b in branches %}
+                <option value="{{ b.id }}" {% if b.id|stringformat:'s' == branch_id %}selected{% endif %}>{{ b.selection_label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Semester</label>
+            <select name="semester" required>
+              <option value="">-- Select --</option>
+              {% for s in semesters %}
+                <option value="{{ s.id }}" {% if s.id|stringformat:'s' == semester_id %}selected{% endif %}>{{ s.number }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Division</label>
+            <select name="division" multiple>
+              <option value="">All</option>
+              <option value="A" {% if 'A' in selected_divisions %}selected{% endif %}>A</option>
+              <option value="B" {% if 'B' in selected_divisions %}selected{% endif %}>B</option>
+              <option value="C" {% if 'C' in selected_divisions %}selected{% endif %}>C</option>
+              <option value="D" {% if 'D' in selected_divisions %}selected{% endif %}>D</option>
+              <option value="E" {% if 'E' in selected_divisions %}selected{% endif %}>E</option>
+              <option value="F" {% if 'F' in selected_divisions %}selected{% endif %}>F</option>
+              <option value="G" {% if 'G' in selected_divisions %}selected{% endif %}>G</option>
+            </select>
+          </div>
+          <div>
+            <label>Subject</label>
+            <select name="filter_subject">
+              <option value="">All</option>
+              {% for subj in subjects %}
+                <option value="{{ subj.id }}" {% if filter_subject_id|add:"" == subj.id|add:"" %}selected{% endif %}>{{ subj.code }} - {{ subj.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <button type="submit">Load</button>
+          </div>
+        </form>
+      </div>
+
+      {% if branch_id and semester_id %}
+        <div class="message">Selected: Branch {{ branch_id }}, Semester {{ semester_id }}{% if selected_divisions %}, Divisions {{ selected_divisions|join:", " }}{% endif %}{% if filter_subject_id %}, Subject filter applied{% endif %}. Loaded: {{ students|length }} students, {{ subjects|length }} subjects.</div>
+      {% endif %}
+
+      <div class="panel" style="margin-top:16px;">
+        <h3 style="margin:0 0 10px 0;">Upload Elective Assignments</h3>
+        <p class="note" style="margin-top:0;">Required columns: <b>enrollment_no</b>, <b>elective_group</b>, <b>subject_code</b>.</p>
+        <p class="note" style="margin-top:0;"><a href="{% url 'download_elective_upload_sample' %}">Download Sample Elective Upload File</a></p>
+        {% if branch_id and semester_id %}
+          <form method="post" enctype="multipart/form-data" class="controls">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="upload_electives">
+            <input type="hidden" name="branch" value="{{ branch_id }}">
+            <input type="hidden" name="semester" value="{{ semester_id }}">
+            <input type="file" name="file" accept=".xlsx,.xls,.csv" required>
+            <button type="submit">Upload Electives</button>
+          </form>
+        {% else %}
+          <p class="note">Select Branch and Semester to enable uploads.</p>
+        {% endif %}
+
+        {% if upload_results %}
+          <div class="message" style="margin-top:10px;">
+            Upload results: {{ upload_results.created }} created, {{ upload_results.updated }} updated,
+            {{ upload_results.skipped }} skipped, {{ upload_results.errors }} errors
+            ({{ upload_results.total }} rows).
+          </div>
+        {% endif %}
+
+        {% if upload_errors %}
+          <div class="message" style="background:#fee; border-color:#f99;">
+            <b>Upload issues:</b>
+            <ul style="margin:8px 0 0 18px;">
+              {% for err in upload_errors %}
+                <li>{{ err }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if students and subjects %}
+        <div class="panel" style="margin-top:16px;">
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="branch" value="{{ branch_id }}">
+            <input type="hidden" name="semester" value="{{ semester_id }}">
+            {% for division in selected_divisions %}
+            <input type="hidden" name="division" value="{{ division }}">
+            {% endfor %}
+            {% if filter_subject_id %}
+            <input type="hidden" name="filter_subject" value="{{ filter_subject_id }}">
+            {% endif %}
+
+            <div class="controls">
+              <button name="action" value="save_electives" type="submit">Save Electives</button>
+              <a href="{% if request.GET %}?{{ request.GET.urlencode|safe }}&download=csv{% else %}?download=csv{% endif %}">Download CSV</a>
+            </div>
+
+            {% if fixed_subjects %}
+              <div class="note" style="margin:10px 0 6px 0;">
+                <b>Fixed subjects:</b>
+                {% for subj in fixed_subjects %}
+                  <span class="tag fixed" title="{{ subj.name }}">{{ subj.code }} - {{ subj.name }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  {% for group in elective_groups %}
+                    <th>{{ group.name }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for stu in students %}
+                  <tr>
+                    <td>{{ stu.enrollment_no }} - {{ stu.name }}</td>
+                    {% for group in elective_groups %}
+                      <td>
+                        {% with selection=elective_selection|get_item:stu.id %}
+                        <select name="elective_{{ stu.id }}_{{ group.key }}">
+                          <option value="">-- Select --</option>
+                          {% for subj in group.subjects %}
+                            <option value="{{ subj.id }}" {% if selection and selection|get_item:group.key == subj.id %}selected{% endif %}>{{ subj.code }} - {{ subj.name }}</option>
+                          {% endfor %}
+                        </select>
+                        {% endwith %}
+                      </td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </form>
+        </div>
+      {% elif branch_id and semester_id %}
+        <div class="panel" style="margin-top:16px;">
+          {% if students and not subjects %}
+            <p class="note">Students are loaded, but no subjects are defined for this Branch+Semester.
+              <a href="{% url 'manage_subjects' %}?branch={{ branch_id }}&semester={{ semester_id }}">Add subjects</a> to enable enrollments.
+            </p>
+          {% elif subjects and not students %}
+            <p class="note">Subjects are defined, but no students found for this Branch+Semester{% if selected_divisions %} / Divisions {{ selected_divisions|join:", " }}{% endif %}. Upload or add students first.</p>
+          {% else %}
+            <p class="note">Select Branch and Semester to load students and subjects.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </main>
+  </div>
+
+</body>
+</html>

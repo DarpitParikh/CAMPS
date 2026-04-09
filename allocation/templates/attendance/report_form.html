@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Attendance Report</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex: 1; padding: 28px; }
+    h1 { margin: 0 0 10px 0; color: var(--text); }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      max-width: 980px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      border: 1px solid #eef2f7;
+    }
+    label { display:block; margin-top:10px; font-weight:bold; color: var(--text); }
+    input[type=text], input[type=number], input[type=date], textarea, select {
+      width:100%;
+      padding:10px;
+      margin-top:6px;
+      box-sizing:border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+    }
+    input[type=file] { width:100%; padding:8px; margin-top:6px; box-sizing:border-box; border: 1px solid #d1d5db; border-radius: 6px; background: white; }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+    }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:6px; margin-bottom:16px; }
+    button {
+      margin-top:14px;
+      padding:10px 16px;
+      background:var(--primary);
+      color:white;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight: 600;
+    }
+    button:hover { background:var(--primary-2); }
+    .btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .btn-secondary { background:#374151; }
+    .btn-secondary:hover { background:#1f2937; }
+    .note { color:#6b7280; font-size:12px; margin-top:6px; }
+    @media (max-width: 900px) {
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='attendance' %}
+      {% include 'partials/sidebar.html' %}
+    {% endwith %}
+    <main class="content">
+      <h1>Attendance Report</h1>
+      {% include 'partials/back_to_dashboard.html' %}
+
+      {% if message %}
+    <div class="message">{{ message }}</div>
+  {% endif %}
+
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="row">
+        <div>
+          <label>Institute Line 1</label>
+          <input type="text" name="institute_line1" value="KADI SARVA VISHWAVIDYALAYA">
+        </div>
+        <div>
+          <label>Institute Line 2</label>
+          <input type="text" name="institute_line2" value="LDRP Institute of Technology and Research Gandhinagar">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Exam Title</label>
+          <input type="text" name="exam_title" placeholder="Mid Semester Examination September-2025">
+        </div>
+        <div>
+          <label>Report Title</label>
+          <input type="text" name="report_title" value="ATTENDANCE REPORT">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Branch</label>
+          <select name="branch" id="branch_select">
+            <option value="">Select Branch</option>
+            {% for item in branches %}
+              <option value="{{ item.id }}" {% if selected_branch_id|add:'' == item.id|add:'' %}selected{% endif %}>{{ item.selection_label }}</option>
+            {% endfor %}
+            {% for item in custom_branch_options %}
+              <option value="custom:{{ item.name }}" {% if selected_branch_id == 'custom:'|add:item.name %}selected{% endif %}>{{ item.label }}</option>
+            {% endfor %}
+          </select>
+          <input type="text" name="branch_custom" list="branch_suggestions" value="{{ branch_custom_input }}" placeholder="Or type branch name">
+          <datalist id="branch_suggestions">
+            {% for name in branch_suggestions %}
+              <option value="{{ name }}"></option>
+            {% endfor %}
+          </datalist>
+          <div class="note">You can select from dropdown or type branch name.</div>
+        </div>
+        <div>
+          <label>Semester</label>
+          <select name="semester" id="semester_select">
+            <option value="">Select Semester</option>
+            {% for item in semesters %}
+              <option value="{{ item.id }}" {% if selected_semester_id|add:'' == item.id|add:'' %}selected{% endif %}>Semester {{ item.number }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Block No</label>
+          <input type="text" name="block_no" value="{{ block_no_input }}" placeholder="A,B,C">
+          <div class="note">Enter comma-separated block numbers to print different block on each page (example: A,B,C).</div>
+        </div>
+        <div>
+          <label>Room Numbers</label>
+          <input type="text" name="room_numbers" value="{{ room_numbers_input }}" placeholder="101,102,103 or 301-305">
+          <div class="note">Enter comma-separated rooms or numeric range.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Students Per Room</label>
+          <input type="number" name="students_per_room" min="1" value="{{ students_per_room_input|default:35 }}">
+          <div class="note">Used to split students room-wise and create pages.</div>
+        </div>
+        <div>
+          <label>Room-wise Students Count (optional)</label>
+          <input type="text" name="students_per_room_list" value="{{ students_per_room_list_input }}" placeholder="30,35,32">
+          <div class="note">Optional override per room in room order. Example rooms 101,102,103 with counts 30,35,32.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Date</label>
+          <input type="date" name="date_text">
+        </div>
+        <div>
+          <label>Exam Time (optional)</label>
+          <input type="text" name="exam_time" value="{{ exam_time_input }}" placeholder="10:30 AM to 12:30 PM">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Print Options</label>
+          <div style="margin-top:6px;">
+            <input type="checkbox" name="include_room_no" {% if include_room_no != False %}checked{% endif %}> Show Room No. in PDF
+          </div>
+          <div class="note">Uncheck if you do not want room number printed.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Student Order</label>
+          <select name="order_by">
+            <option value="uploaded" {% if selected_order_by == 'uploaded' %}selected{% endif %}>As Uploaded (Excel Order)</option>
+            <option value="enrollment_no" {% if selected_order_by == 'enrollment_no' %}selected{% endif %}>Enrollment No (default)</option>
+            <option value="exam_no" {% if selected_order_by == 'exam_no' %}selected{% endif %}>Exam No</option>
+            <option value="name" {% if selected_order_by == 'name' %}selected{% endif %}>Name</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Student List File (optional)</label>
+          <input type="file" name="students_file" accept=".xlsx,.xls,.csv">
+          <div class="note"><a href="{% url 'download_attendance_upload_sample' %}">Download sample upload file</a></div>
+          <div class="note">If uploaded, this file will be used instead of students from database.</div>
+          <div class="note">Required columns: Enrollment No, Name. Optional: Division, Elective, Room No, Exam No.</div>
+        </div>
+      </div>
+
+      <label>Subject</label>
+      <select name="subject" id="subject_select">
+        <option value="">Select Subject</option>
+        {% for item in subjects %}
+          <option
+            value="{{ item.id }}"
+            data-branch-id="{{ item.branch_id }}"
+            data-semester-id="{{ item.semester_id }}"
+            {% if selected_subject_id|add:'' == item.id|add:'' %}selected{% endif %}
+          >{{ item.code }} - {{ item.name }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="subject_custom" list="subject_suggestions" value="{{ subject_custom_input }}" placeholder="Or type subject manually">
+      <datalist id="subject_suggestions">
+        {% for label in subject_suggestions %}
+          <option value="{{ label }}"></option>
+        {% endfor %}
+      </datalist>
+      <div class="note">You can select from dropdown or type subject name manually.</div>
+
+      <div class="row">
+        <div>
+          <label>Supervisor Name</label>
+          <input type="text" name="supervisor_name" placeholder="Full Name">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Rows (max 40)</label>
+          <input type="number" name="row_count" min="1" max="40" value="{{ row_count|default:35 }}">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" name="output_format" value="pdf">Generate Attendance Report</button>
+        <button type="submit" name="output_format" value="excel" class="btn-secondary">Download Excel Format</button>
+        <button type="submit" name="output_format" value="summary_preview" class="btn-secondary">Preview Seating Summary</button>
+        <button type="submit" name="output_format" value="summary_download" class="btn-secondary" {% if not can_download_summary %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>Download Seating Summary</button>
+      </div>
+      <div class="note">For CE Seating Summary: preview first, then download.</div>
+    </form>
+  </div>
+    </main>
+  </div>
+</body>
+<script>
+  (function() {
+    const branchSelect = document.getElementById('branch_select');
+    const semesterSelect = document.getElementById('semester_select');
+    const subjectSelect = document.getElementById('subject_select');
+    if (!branchSelect || !semesterSelect || !subjectSelect) {
+      return;
+    }
+
+    const allSubjectOptions = Array.from(subjectSelect.querySelectorAll('option'));
+
+    function rebuildSubjects() {
+      const selectedBranch = branchSelect.value;
+      const selectedSemester = semesterSelect.value;
+      const previousSubject = subjectSelect.value;
+      const isCustomBranch = selectedBranch.indexOf('custom:') === 0;
+
+      const filtered = allSubjectOptions.filter(function(option) {
+        if (!option.value) {
+          return true;
+        }
+        const optionBranch = option.getAttribute('data-branch-id') || '';
+        const optionSemester = option.getAttribute('data-semester-id') || '';
+        const branchMatch = !selectedBranch || isCustomBranch || optionBranch === selectedBranch;
+        const semesterMatch = !selectedSemester || optionSemester === selectedSemester;
+        return branchMatch && semesterMatch;
+      });
+
+      subjectSelect.innerHTML = '';
+      filtered.forEach(function(option) {
+        subjectSelect.appendChild(option);
+      });
+
+      const stillValid = filtered.some(function(option) {
+        return option.value === previousSubject;
+      });
+      if (stillValid) {
+        subjectSelect.value = previousSubject;
+      } else {
+        subjectSelect.value = '';
+      }
+    }
+
+    branchSelect.addEventListener('change', rebuildSubjects);
+    semesterSelect.addEventListener('change', rebuildSubjects);
+    rebuildSubjects();
+  })();
+</script>
+</html>

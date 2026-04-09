@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mark Attendance</title>
+    {% include 'partials/sidebar_styles.html' %}
+    <style>
+        .content { flex: 1; padding: 28px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .back-link:hover { text-decoration: underline; }
+        
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label span {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        
+        .btn-load {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-load:hover { background-color: #2980b9; }
+
+        .btn-preview {
+            background-color: #4b5563;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .btn-preview:hover { background-color: #374151; }
+        
+        .students-section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .students-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .student-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .student-item {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #ecf0f1;
+        }
+        
+        .student-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .student-detail {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .attendance-toggle {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .attendance-toggle button {
+            padding: 6px 12px;
+            border: 1px solid #bdc3c7;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .attendance-toggle button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .btn-save {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .btn-save:hover { background-color: #229954; }
+        
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group { grid-template-columns: 1fr; }
+            .student-item { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        {% with active_page='attendance' %}
+            {% include 'partials/sidebar.html' %}
+        {% endwith %}
+        <main class="content">
+        
+        <!-- Filters -->
+        <div class="filter-section">
+            {% if mentor_error %}
+            <div style="margin-bottom:12px; padding:10px 12px; background:#fee2e2; border:1px solid #fecaca; color:#991b1b; border-radius:6px;">
+                {{ mentor_error }}
+            </div>
+            {% endif %}
+            <form method="get">
+                <div class="form-group">
+                    <label>
+                        <span>Semester</span>
+                        <select name="semester" id="semester" required>
+                            <option value="">Select Semester...</option>
+                            {% for sem in form.semester.field.queryset %}
+                            <option value="{{ sem.id }}" {% if request.GET.semester|add:"" == sem.id|add:"" %}selected{% endif %}>
+                                Semester {{ sem.number }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>Subject</span>
+                        <select name="subject" id="subject" required>
+                            <option value="">Select Subject...</option>
+                            {% for subj in form.subject.field.queryset %}
+                            <option value="{{ subj.id }}" data-semester-id="{{ subj.semester_id }}" {% if request.GET.subject|add:"" == subj.id|add:"" %}selected{% endif %}>
+                                {{ subj.code }} - {{ subj.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>Divisions</span>
+                        <select name="division" id="division" multiple>
+                            <option value="A" {% if 'A' in selected_divisions %}selected{% endif %}>A</option>
+                            <option value="B" {% if 'B' in selected_divisions %}selected{% endif %}>B</option>
+                            <option value="C" {% if 'C' in selected_divisions %}selected{% endif %}>C</option>
+                            <option value="D" {% if 'D' in selected_divisions %}selected{% endif %}>D</option>
+                            <option value="E" {% if 'E' in selected_divisions %}selected{% endif %}>E</option>
+                            <option value="F" {% if 'F' in selected_divisions %}selected{% endif %}>F</option>
+                            <option value="G" {% if 'G' in selected_divisions %}selected{% endif %}>G</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Date</span>
+                        <input type="date" name="date" value="{{ request.GET.date|default:form.date.value }}" required>
+                    </label>
+                    <label>
+                        <span>Students Per Page</span>
+                        <input type="number" name="rows_per_page" min="20" max="80" value="{{ request.GET.rows_per_page|default:'40' }}">
+                    </label>
+                </div>
+                <button type="submit" class="btn-load">Load Students</button>
+                {% if request.GET.semester and request.GET.subject and request.GET.date %}
+                <a href="{% url 'manual_attendance_sheet_preview' %}?{{ request.GET.urlencode }}" target="_blank" class="btn-preview">
+                    Preview Manual Sheet
+                </a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <!-- Students List -->
+        {% if students %}
+        <div class="students-section">
+            <h2>📚 {{ students|length }} Students{% if selected_divisions %} - Divisions {{ selected_divisions|join:", " }}{% endif %}</h2>
+            
+            <!-- Bulk Actions -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 2px solid #e9ecef;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" onclick="markAllPresent()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        ✓ Mark All Present
+                    </button>
+                    <button type="button" onclick="markAllAbsent()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        ✗ Mark All Absent
+                    </button>
+                    <button type="button" onclick="invertSelection()" style="background: #9b59b6; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        ⇄ Invert Selection
+                    </button>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="semester" value="{{ request.GET.semester }}">
+                <input type="hidden" name="subject" value="{{ request.GET.subject }}">
+                <input type="hidden" name="date" value="{{ request.GET.date }}">
+                {% for division in selected_divisions %}
+                <input type="hidden" name="division" value="{{ division }}">
+                {% endfor %}
+                <div class="student-list">
+                    {% for student in students %}
+                    <div class="student-item" data-enrollment="{{ student.enrollment_no }}" data-student-id="{{ student.id }}">
+                        <div>
+                            <div class="student-name">{{ student.enrollment_no }} - {{ student.name }}{% if student.division %} (Div: {{ student.division }}){% endif %}</div>
+                            <div class="student-detail">{{ student.enrollment_no }}{% if student.division %} • Division {{ student.division }}{% endif %}</div>
+                        </div>
+                        <div class="attendance-toggle">
+                            <button type="button" class="attendance-btn present-btn active" data-status="P">P</button>
+                            <button type="button" class="attendance-btn absent-btn" data-status="A">A</button>
+                            <input type="hidden" name="student_{{ student.id }}" id="att_{{ student.id }}" value="P">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="submit" class="btn-save">💾 Save Attendance</button>
+            </form>
+        </div>
+        {% endif %}
+        
+    <script>
+        function setStudentStatus(studentId, status) {
+            const hidden = document.getElementById('att_' + studentId);
+            if (!hidden) return;
+            
+            hidden.value = status;
+            const item = hidden.closest('.student-item');
+            if (!item) return;
+            
+            const buttons = item.querySelectorAll('.attendance-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.status === status) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function markAllPresent() {
+            document.querySelectorAll('.student-item').forEach(item => {
+                const studentId = item.dataset.studentId;
+                setStudentStatus(studentId, 'P');
+            });
+        }
+        
+        function markAllAbsent() {
+            document.querySelectorAll('.student-item').forEach(item => {
+                const studentId = item.dataset.studentId;
+                setStudentStatus(studentId, 'A');
+            });
+        }
+        
+        function invertSelection() {
+            document.querySelectorAll('.student-item').forEach(item => {
+                const studentId = item.dataset.studentId;
+                const hidden = document.getElementById('att_' + studentId);
+                if (!hidden) return;
+                
+                const newStatus = hidden.value === 'P' ? 'A' : 'P';
+                setStudentStatus(studentId, newStatus);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const semesterSelect = document.getElementById('semester');
+            const subjectSelect = document.getElementById('subject');
+            const allSubjectOptions = subjectSelect ? Array.from(subjectSelect.querySelectorAll('option')) : [];
+
+            function rebuildSubjectsBySemester() {
+                if (!semesterSelect || !subjectSelect) return;
+
+                const selectedSemester = semesterSelect.value;
+                const previousSubject = subjectSelect.value;
+
+                const filtered = allSubjectOptions.filter(function(option) {
+                    if (!option.value) {
+                        return true;
+                    }
+                    const optionSemester = option.getAttribute('data-semester-id') || '';
+                    return !selectedSemester || optionSemester === selectedSemester;
+                });
+
+                subjectSelect.innerHTML = '';
+                filtered.forEach(function(option) {
+                    subjectSelect.appendChild(option);
+                });
+
+                const stillValid = filtered.some(function(option) {
+                    return option.value === previousSubject;
+                });
+                subjectSelect.value = stillValid ? previousSubject : '';
+            }
+
+            if (semesterSelect && subjectSelect) {
+                semesterSelect.addEventListener('change', rebuildSubjectsBySemester);
+                rebuildSubjectsBySemester();
+            }
+
+            const list = document.querySelector('.student-list');
+            if (!list) return;
+            
+            list.querySelectorAll('.student-item').forEach(item => {
+                const studentId = item.dataset.studentId;
+                item.querySelectorAll('.attendance-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const status = btn.dataset.status;
+                        setStudentStatus(studentId, status);
+                    });
+                });
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+                
+                // Ctrl+S to save
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    const saveBtn = document.querySelector('.btn-save');
+                    if (saveBtn) saveBtn.click();
+                }
+                
+                // Ctrl+A for Mark All Present
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    markAllPresent();
+                }
+            });
+        });
+    </script>
+        </main>
+    </div>
+</body>
+</html>

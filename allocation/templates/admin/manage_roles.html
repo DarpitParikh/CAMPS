@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin: Manage Faculty</title>
+    {% include 'partials/sidebar_styles.html' %}
+    <style>
+        .content { flex: 1; padding: 28px; }
+        .content h1 { margin-bottom: 8px; }
+        .content .note { color: #555; margin-bottom: 20px; }
+        .content .message { background:#eef; border:1px solid #99c; padding:10px; border-radius:4px; margin-bottom:16px; }
+        .content .success { background:#efe; border:1px solid #9c9; }
+        .content .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px; }
+        .content .card { border:1px solid #ddd; border-radius:8px; padding:16px; }
+        .content label { display:block; margin-top:10px; font-weight:bold; }
+        .content select, .content input[type=text], .content input[type=email] { width:100%; padding:8px; margin-top:6px; }
+        .content .subjects-grid { margin-top:6px; border:1px solid #ddd; border-radius:6px; padding:8px; max-height:180px; overflow:auto; background:#fafafa; }
+        .content .subject-item { display:flex; align-items:center; gap:8px; padding:4px 2px; border-bottom:1px dashed #ececec; font-weight:normal; margin-top:0; }
+        .content .subject-item:last-child { border-bottom:none; }
+        .content button { margin-top:14px; padding:10px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; }
+        .content button:hover { background:#5568d3; }
+        .content ul { list-style: none; padding-left: 0; }
+        .content li { padding: 6px 0; border-bottom: 1px dashed #eee; }
+        .content table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .content th, .content td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .content th { background: #f8f8f8; font-weight: bold; }
+        .content .content .credential-box { background: #fffacd; border: 2px solid #ffa500; padding: 12px; border-radius: 6px; margin: 10px 0; font-family: monospace; }
+        .content h2 { margin-top: 0; }
+        .content p { margin: 0; }
+    </style>
+</head>
+<body>
+<div class="layout">
+{% with active_page='roles' %}
+{% include 'partials/sidebar.html' %}
+{% endwith %}
+<main class="content">
+    <h1>Admin: Manage Faculty</h1>
+    <p class="note">Create new faculty users with auto-generated credentials or assign roles to existing users.</p>
+
+    {% if message %}
+      <div class="message {% if generated_password %}success{% endif %}">
+        {{ message }}
+        {% if generated_password %}
+          <div class="credential-box">
+            <strong>⚠️ IMPORTANT: Save these credentials!</strong><br>
+            This password will not be shown again.
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="grid">
+        <div class="card">
+            <h2>Create New Faculty</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_faculty">
+
+                <label>Full Name *</label>
+                <input type="text" name="full_name" placeholder="e.g., Dr. Rajesh Kumar" required>
+
+                <label>Email (used as username) *</label>
+                <input type="email" name="email" placeholder="e.g., rajesh@example.com" required>
+
+                <label>Employee ID *</label>
+                <input type="text" name="employee_id" placeholder="e.g., EMP0025" required>
+
+                <label>Assign Subjects</label>
+                <div class="subjects-grid">
+                    {% for s in subjects %}
+                    <label class="subject-item">
+                        <input type="checkbox" name="subjects" value="{{ s.id }}">
+                        <span>{{ s.code }} - {{ s.name }}</span>
+                    </label>
+                    {% empty %}
+                    <div>No subjects defined</div>
+                    {% endfor %}
+                </div>
+
+                <label>Mentor Semester (optional)</label>
+                <select name="mentor_semester">
+                  <option value="">-- None --</option>
+                  {% for sem in semesters %}
+                  <option value="{{ sem.id }}">Semester {{ sem.number }}</option>
+                  {% endfor %}
+                </select>
+
+                <label>Mentor Division (optional)</label>
+                <select name="mentor_division">
+                  <option value="">-- None --</option>
+                  {% for div_value, div_label in division_choices %}
+                  <option value="{{ div_value }}">{{ div_label }}</option>
+                  {% endfor %}
+                </select>
+
+                <button type="submit">Create Faculty User</button>
+            </form>
+            <p style="font-size:12px; color:#666; margin-top:10px;">
+              Password will be randomly generated and shown once.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Assign Role to Existing User</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="assign">
+
+                <label>User without faculty</label>
+                <select name="user_id">
+                    {% for u in users_without_faculty %}
+                      <option value="{{ u.id }}">{{ u.username }} ({{ u.email }})</option>
+                    {% empty %}
+                      <option value="" disabled>No users available</option>
+                    {% endfor %}
+                </select>
+
+                <label>Employee ID</label>
+                <input type="text" name="employee_id" placeholder="e.g., EMP0012">
+
+                <label>Assign Subjects</label>
+                <div class="subjects-grid">
+                    {% for s in subjects %}
+                    <label class="subject-item">
+                        <input type="checkbox" name="subjects" value="{{ s.id }}">
+                        <span>{{ s.code }} - {{ s.name }}</span>
+                    </label>
+                    {% empty %}
+                    <div>No subjects defined</div>
+                    {% endfor %}
+                </div>
+
+                <label>Mentor Semester (optional)</label>
+                <select name="mentor_semester">
+                  <option value="">-- None --</option>
+                  {% for sem in semesters %}
+                  <option value="{{ sem.id }}">Semester {{ sem.number }}</option>
+                  {% endfor %}
+                </select>
+
+                <label>Mentor Division (optional)</label>
+                <select name="mentor_division">
+                  <option value="">-- None --</option>
+                  {% for div_value, div_label in division_choices %}
+                  <option value="{{ div_value }}">{{ div_label }}</option>
+                  {% endfor %}
+                </select>
+
+                <button type="submit">Assign Faculty</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 30px;">
+        <h2>Edit Faculty Details</h2>
+        <form method="post" id="edit-faculty-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_faculty">
+
+            <label>Select Faculty</label>
+            <select name="faculty_id" id="faculty_id" required>
+                <option value="">-- Select --</option>
+                {% for f in all_faculty %}
+                    <option value="{{ f.id }}"
+                          data-full-name="{{ f.user.get_full_name }}"
+                          data-email="{{ f.user.email }}"
+                          data-employee-id="{{ f.employee_id }}"
+                          data-subjects="{% for s in f.subjects.all %}{{ s.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+                    {{ f.user.username }} ({{ f.user.get_full_name|default:"-" }})
+                  </option>
+                {% endfor %}
+            </select>
+
+            <label>Full Name</label>
+            <input type="text" name="full_name" id="edit_full_name" placeholder="Full name">
+
+            <label>Email (used as username)</label>
+            <input type="email" name="email" id="edit_email" placeholder="Email">
+
+            <label>New Password (optional)</label>
+            <input type="text" name="new_password" placeholder="Leave blank to keep current password">
+            <label>Employee ID</label>
+            <input type="text" name="employee_id" id="edit_employee_id" placeholder="Employee ID">
+
+            <label>Assign Subjects</label>
+            <div class="subjects-grid" id="edit_subjects">
+                {% for s in subjects %}
+                <label class="subject-item">
+                    <input type="checkbox" name="subjects" value="{{ s.id }}" class="edit-subject-checkbox">
+                    <span>{{ s.code }} - {{ s.name }}</span>
+                </label>
+                {% empty %}
+                <div>No subjects defined</div>
+                {% endfor %}
+            </div>
+
+            <label>Mentor Semester (optional)</label>
+            <select name="mentor_semester" id="edit_mentor_semester">
+              <option value="">-- Keep unchanged --</option>
+              {% for sem in semesters %}
+              <option value="{{ sem.id }}">Semester {{ sem.number }}</option>
+              {% endfor %}
+            </select>
+
+            <label>Mentor Division (optional)</label>
+            <select name="mentor_division" id="edit_mentor_division">
+              <option value="">-- Keep unchanged --</option>
+              {% for div_value, div_label in division_choices %}
+              <option value="{{ div_value }}">{{ div_label }}</option>
+              {% endfor %}
+            </select>
+
+            <button type="submit">Update Faculty</button>
+        </form>
+    </div>
+
+        <div class="card" style="margin-bottom: 30px;">
+          <h2>Class Mentor Assignments</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Semester</th>
+                <th>Division</th>
+                <th>Mentor Faculty</th>
+                <th>Assigned At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assignment in mentor_assignments %}
+              <tr>
+                <td>Semester {{ assignment.semester.number }}</td>
+                <td>{{ assignment.division }}</td>
+                <td>{{ assignment.faculty.user.get_full_name|default:assignment.faculty.user.username }}</td>
+                <td>{{ assignment.assigned_at|date:'d M Y, h:i A' }}</td>
+                <td>
+                  <form method="post" onsubmit="return confirm('Remove this mentor assignment?');" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_mentor_assignment">
+                    <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                    <button type="submit" style="background:#dc2626;">Remove</button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" style="text-align:center;">No mentor assignments yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+    <div class="card">
+        <h2>All Faculty Members</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Employee ID</th>
+                    <th>Email</th>
+                        <th>Subjects</th>
+                        <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in all_faculty %}
+                <tr>
+                    <td>{{ f.user.username }}</td>
+                    <td>{{ f.user.get_full_name|default:"-" }}</td>
+                    <td>{{ f.employee_id }}</td>
+                    <td>{{ f.user.email|default:"-" }}</td>
+                    <td>{{ f.subjects.count }}</td>
+                    <td>
+                        <form method="post" onsubmit="return confirm('Delete this faculty user?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_faculty">
+                            <input type="hidden" name="faculty_id" value="{{ f.id }}">
+                            <button type="submit" style="background:#dc2626;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;">No faculty members yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+      (function() {
+        const select = document.getElementById('faculty_id');
+        const fullName = document.getElementById('edit_full_name');
+        const email = document.getElementById('edit_email');
+        const employeeId = document.getElementById('edit_employee_id');
+        const subjects = document.querySelectorAll('.edit-subject-checkbox');
+
+        if (!select) return;
+
+        const clearSubjects = () => {
+          subjects.forEach(cb => { cb.checked = false; });
+        };
+
+        select.addEventListener('change', () => {
+          const opt = select.options[select.selectedIndex];
+          if (!opt) return;
+
+          fullName.value = opt.dataset.fullName || '';
+          email.value = opt.dataset.email || '';
+          employeeId.value = opt.dataset.employeeId || '';
+
+          clearSubjects();
+          const ids = (opt.dataset.subjects || '').split(',').filter(Boolean);
+          if (ids.length) {
+            subjects.forEach(cb => {
+              if (ids.includes(cb.value)) {
+                cb.checked = true;
+              }
+            });
+          }
+        });
+      })();
+    </script>
+
+</main>
+</div>
+</body>
+</html>

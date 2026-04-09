@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Announcements</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --surface: #ffffff;
+      --bg: #f8fafc;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(79,70,229,0.12), transparent 36%),
+        radial-gradient(circle at top right, rgba(14,165,233,0.10), transparent 34%),
+        var(--bg);
+    }
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 18px 24px 0 24px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .top-link {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--border);
+      color: #1f2937;
+      text-decoration: none;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+      transition: all 0.2s ease;
+    }
+    .top-link:hover { transform: translateY(-1px); background: #fff; }
+    .content { max-width: 1180px; margin: 0 auto; padding: 18px 24px 34px 24px; }
+    .hero {
+      background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+      color: #fff;
+      border-radius: 16px;
+      padding: 22px 24px;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.25);
+      margin-bottom: 16px;
+    }
+    .hero h1 { margin: 0; font-size: 32px; }
+    .hero p { margin: 8px 0 0 0; color: rgba(255,255,255,0.92); }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0 16px 0;
+      flex-wrap: wrap;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    }
+    .tab {
+      display: inline-block;
+      padding: 9px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #374151;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+    .tab:hover { border-color: #a5b4fc; color: #312e81; }
+    .tab.active {
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+    .body {
+      white-space: pre-wrap;
+      margin-top: 8px;
+      color: #1f2937;
+      line-height: 1.55;
+    }
+    .tag { display:inline-block; padding:4px 9px; border-radius:999px; font-size:12px; font-weight:700; margin-right:6px; }
+    .tag-notice { background:#e0ecff; color:#1d4ed8; }
+    .tag-result { background:#ede9fe; color:#6d28d9; }
+    .new { background:#dcfce7; color:#166534; border-radius:999px; font-size:11px; font-weight:700; padding:4px 8px; }
+    .meta { color:var(--muted); font-size:12px; margin-top:10px; }
+    .notify-bar {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    }
+    .notify-text { color: #374151; font-size: 14px; }
+    .notify-actions { display: flex; gap: 8px; }
+    .notify-btn {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .notify-btn.primary {
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      border-color: transparent;
+      color: #fff;
+    }
+    .notify-btn:hover { opacity: 0.95; }
+    .notify-status { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .attachments { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .attachment-link { color: #1d4ed8; text-decoration: none; font-weight: 600; }
+    .attachment-link:hover { text-decoration: underline; }
+    .attachment-image { max-width: 100%; width: 340px; border: 1px solid var(--border); border-radius: 10px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="top-link" href="{% url 'public_home' %}">Home</a>
+    <a class="top-link" href="{% url 'public_result' %}">Result</a>
+  </div>
+  <main class="content">
+      <section class="hero">
+        <h1>Announcements</h1>
+        <p>Latest notices and result declarations published by the institute.</p>
+      </section>
+      <div class="tabs">
+        <a class="tab {% if selected_type == 'all' %}active{% endif %}" href="{% url 'public_notices' %}?type=all">All</a>
+        <a class="tab {% if selected_type == 'notice' %}active{% endif %}" href="{% url 'public_notices' %}?type=notice">Notices</a>
+        <a class="tab {% if selected_type == 'result' %}active{% endif %}" href="{% url 'public_notices' %}?type=result">Results</a>
+      </div>
+
+      <div class="notify-bar" id="notifyBar" style="display:none;">
+        <div class="notify-text">Allow browser notifications to get result/notice alerts instantly.</div>
+        <div class="notify-actions">
+          <button class="notify-btn primary" id="enableNotifyBtn" type="button">Enable Notifications</button>
+          <button class="notify-btn" id="dismissNotifyBtn" type="button">Not now</button>
+        </div>
+      </div>
+      <div class="notify-status" id="notifyStatus"></div>
+
+      {% for item in notices %}
+        <div class="card">
+          <div>
+            {% if item.notice_type == 'RESULT' %}
+              <span class="tag tag-result">Result</span>
+            {% else %}
+              <span class="tag tag-notice">Notice</span>
+            {% endif %}
+            {% if item.published_at and item.published_at >= new_cutoff %}
+              <span class="new">NEW</span>
+            {% endif %}
+          </div>
+          <div class="title">{{ item.title }}</div>
+          <div class="body">{{ item.body }}</div>
+          {% if item.attachments.all %}
+            <div class="attachments">
+              {% for attachment in item.attachments.all %}
+                {% if attachment.file_type == 'image' %}
+                  <a class="attachment-link" href="{{ attachment.file.url }}" target="_blank" rel="noopener">View image: {{ attachment.file_name }}</a>
+                  <img class="attachment-image" src="{{ attachment.file.url }}" alt="{{ attachment.file_name }}" loading="lazy">
+                {% else %}
+                  <a class="attachment-link" href="{{ attachment.file.url }}" target="_blank" rel="noopener">Download: {{ attachment.file_name }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="meta">
+            Published {{ item.published_at|date:'d M Y, h:i A' }}
+          </div>
+        </div>
+      {% empty %}
+        <div class="card">No announcements found.</div>
+      {% endfor %}
+  </main>
+
+  <script>
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    }
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return '';
+    }
+
+    async function fetchPushConfig() {
+      const response = await fetch('{% url "webpush_public_key" %}');
+      return response.json();
+    }
+
+    async function subscribeForPush() {
+      const status = document.getElementById('notifyStatus');
+      const enableBtn = document.getElementById('enableNotifyBtn');
+      if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+        status.textContent = 'Push notifications are not supported on this browser.';
+        if (enableBtn) enableBtn.disabled = true;
+        return;
+      }
+
+      const config = await fetchPushConfig();
+      if (!config.configured || !config.publicKey) {
+        status.textContent = config.reason || 'Notifications are not configured yet. Please try later.';
+        if (enableBtn) enableBtn.disabled = true;
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        status.textContent = 'Permission denied. You can enable it later from browser settings.';
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(config.publicKey),
+        });
+      }
+
+      await fetch('{% url "webpush_subscribe" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
+      });
+
+      status.textContent = 'Notifications enabled on this browser/device.';
+      const bar = document.getElementById('notifyBar');
+      if (bar) bar.style.display = 'none';
+    }
+
+    (async function initPushPrompt() {
+      const status = document.getElementById('notifyStatus');
+      const bar = document.getElementById('notifyBar');
+      const enableBtn = document.getElementById('enableNotifyBtn');
+      const dismissBtn = document.getElementById('dismissNotifyBtn');
+
+      if (!bar || !enableBtn || !dismissBtn) return;
+
+      if (!('Notification' in window)) {
+        status.textContent = 'This browser does not support notifications.';
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        status.textContent = 'Notifications already enabled on this browser/device.';
+        return;
+      }
+
+      bar.style.display = 'flex';
+
+      try {
+        const config = await fetchPushConfig();
+        if (!config.configured || !config.publicKey) {
+          status.textContent = config.reason || 'Notifications are not configured yet. Please try later.';
+          enableBtn.disabled = true;
+          enableBtn.title = 'Server push configuration missing';
+        }
+      } catch (e) {
+        status.textContent = 'Unable to check notification configuration right now.';
+      }
+
+      enableBtn.addEventListener('click', function() {
+        subscribeForPush().catch(function(err) {
+          const msg = err && err.message ? err.message : 'Failed to enable notifications. Please try again.';
+          status.textContent = msg;
+        });
+      });
+
+      dismissBtn.addEventListener('click', function() {
+        bar.style.display = 'none';
+      });
+    })();
+  </script>
+</body>
+</html>

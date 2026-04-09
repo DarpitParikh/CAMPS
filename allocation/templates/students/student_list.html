@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student List</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+
+                .page-actions {
+                        display: flex;
+                        gap: 10px;
+                        flex-wrap: wrap;
+                        margin-bottom: 20px;
+                }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn-search {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filters .btn-search {
+            min-width: 180px;
+        }
+        
+        .btn-search:hover { background-color: #2980b9; }
+        
+        .students-table {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .bulk-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            background: #fafafa;
+        }
+
+        .bulk-actions label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-danger:hover { background-color: #c0392b; }
+
+        .btn-promote {
+            background-color: #2980b9;
+            color: white;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-promote:hover { background-color: #2471a3; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+        
+        table th {
+            background-color: #ecf0f1;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: top;
+        }
+
+        table th {
+            white-space: nowrap;
+        }
+
+        table td:nth-child(2),
+        table td:nth-child(8) {
+            min-width: 170px;
+        }
+        
+        table tr:hover { background-color: #f9f9f9; }
+
+        .student-row-clickable {
+            cursor: pointer;
+        }
+        
+        .btn-view {
+            background-color: #27ae60;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-view:hover { background-color: #229954; }
+        
+        .add-btn {
+            background-color: #16a085;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .add-btn:hover { background-color: #138d75; }
+        
+        @media (max-width: 768px) {
+            .filter-group { grid-template-columns: 1fr; }
+            .filter-actions { justify-content: stretch; }
+            .filters .btn-search { width: 100%; }
+            .page-actions { flex-direction: column; }
+            .add-btn { width: 100%; text-align: center; }
+            table { font-size: 13px; }
+            table th, table td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='students' %}
+    {% include 'partials/sidebar.html' %}
+    {% endwith %}
+    
+    <main class="content">
+        <h1>👥 Student Management</h1>
+        {% include 'partials/back_to_dashboard.html' %}
+
+        {% if not faculty_can_manage_all %}
+        <div style="margin-bottom:12px; padding:10px 12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:6px; color:#9a3412;">
+            Mentor mode: you can take bulk/export actions only for classes where you are assigned as mentor.
+        </div>
+        {% endif %}
+        
+        {% if user.is_staff %}
+        <div class="page-actions">
+        <a href="{% url 'add_student' %}" class="add-btn">+ Add New Student</a>
+        <a href="{% url 'upload_students' %}" class="add-btn" style="background:#8e44ad;">⬆ Upload Students</a>
+        {% if request.GET.branch and request.GET.semester %}
+        <a href="{% url 'manage_enrollments' %}?branch={{ request.GET.branch }}&semester={{ request.GET.semester }}" class="add-btn" style="background:#e67e22;">⚙ Manage Enrollments</a>
+        {% else %}
+        <a href="{% url 'manage_enrollments' %}" class="add-btn" style="background:#e67e22;">⚙ Manage Enrollments</a>
+        {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Filters -->
+        <div class="filters">
+            <form method="get">
+                <div class="filter-group">
+                    <div class="form-group">
+                        <label>Search</label>
+                        <input type="text" name="query" placeholder="Name or enrollment..." value="{{ request.GET.query }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch</label>
+                        <select name="branch">
+                            <option value="">All</option>
+                            {% for branch in form.branch.field.queryset %}
+                            <option value="{{ branch.id }}" {% if request.GET.branch|add:"" == branch.id|add:"" %}selected{% endif %}>{{ branch.selection_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select name="semester">
+                            <option value="">All</option>
+                            {% for sem in form.semester.field.queryset %}
+                            <option value="{{ sem.id }}" {% if request.GET.semester|add:"" == sem.id|add:"" %}selected{% endif %}>Semester {{ sem.number }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Division</label>
+                        <select name="division" multiple>
+                            <option value="">All</option>
+                            <option value="A" {% if 'A' in selected_divisions %}selected{% endif %}>A</option>
+                            <option value="B" {% if 'B' in selected_divisions %}selected{% endif %}>B</option>
+                            <option value="C" {% if 'C' in selected_divisions %}selected{% endif %}>C</option>
+                            <option value="D" {% if 'D' in selected_divisions %}selected{% endif %}>D</option>
+                            <option value="E" {% if 'E' in selected_divisions %}selected{% endif %}>E</option>
+                            <option value="F" {% if 'F' in selected_divisions %}selected{% endif %}>F</option>
+                            <option value="G" {% if 'G' in selected_divisions %}selected{% endif %}>G</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mentor</label>
+                        <input type="text" name="mentor" placeholder="Mentor name..." value="{{ request.GET.mentor }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Admission Year</label>
+                        <input type="number" name="admission_year" min="2000" max="2100" placeholder="e.g. 2024" value="{{ request.GET.admission_year }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Sort By</label>
+                        <select name="sort">
+                            <option value="enrollment_no" {% if request.GET.sort == 'enrollment_no' or not request.GET.sort %}selected{% endif %}>Enrollment No</option>
+                            <option value="uploaded" {% if request.GET.sort == 'uploaded' %}selected{% endif %}>Uploaded Order</option>
+                            <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                            <option value="branch" {% if request.GET.sort == 'branch' %}selected{% endif %}>Branch</option>
+                            <option value="semester" {% if request.GET.sort == 'semester' %}selected{% endif %}>Semester</option>
+                            <option value="division" {% if request.GET.sort == 'division' %}selected{% endif %}>Division</option>
+                            <option value="admission_year" {% if request.GET.sort == 'admission_year' %}selected{% endif %}>Admission Year</option>
+                            <option value="mentor" {% if request.GET.sort == 'mentor' %}selected{% endif %}>Mentor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Order</label>
+                        <select name="order">
+                            <option value="asc" {% if request.GET.order != 'desc' %}selected{% endif %}>Ascending</option>
+                            <option value="desc" {% if request.GET.order == 'desc' %}selected{% endif %}>Descending</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Risk Level</label>
+                        <select name="risk_level">
+                            <option value="" {% if not selected_risk_level %}selected{% endif %}>All</option>
+                            <option value="LOW" {% if selected_risk_level == 'LOW' %}selected{% endif %}>Low</option>
+                            <option value="MEDIUM" {% if selected_risk_level == 'MEDIUM' %}selected{% endif %}>Medium</option>
+                            <option value="HIGH" {% if selected_risk_level == 'HIGH' %}selected{% endif %}>High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn-search">🔍 Search</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Students Table -->
+        <div class="students-table">
+            {% if students %}
+            <div style="margin: 0 0 12px 0;">
+                <a href="{% if request.GET %}?{{ request.GET.urlencode|safe }}&download=csv{% else %}?download=csv{% endif %}" class="btn-search">Download CSV</a>
+            </div>
+            <form method="post" action="{% url 'download_selected_students' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                <div class="bulk-actions">
+                    <label>
+                        <input type="checkbox" id="select-all">
+                        Select all
+                    </label>
+                    <button type="submit" class="btn-search" formaction="{% url 'download_selected_students' %}">Download selected CSV</button>
+                    {% if user.is_staff %}
+                    <label>
+                        <input type="checkbox" name="delete_all" id="delete-all">
+                        Delete all students
+                    </label>
+                    <button type="submit" class="btn-promote" formaction="{% url 'bulk_promote_students' %}">Promote selected</button>
+                    <button type="submit" class="btn-danger" formaction="{% url 'bulk_delete_students' %}">Delete selected</button>
+                    {% endif %}
+                </div>
+
+                <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 48px; text-align:center;">Select</th>
+                            <th>Name
+                                <a href="?{% if request.GET %}{{ request.GET.urlencode|safe }}&{% endif %}sort=name&order=asc" title="Sort A→Z" style="margin-left:6px; text-decoration:none;">▲</a>
+                                <a href="?{% if request.GET %}{{ request.GET.urlencode|safe }}&{% endif %}sort=name&order=desc" title="Sort Z→A" style="margin-left:4px; text-decoration:none;">▼</a>
+                            </th>
+                            <th>Enrollment No</th>
+                            <th>Branch</th>
+                            <th>Semester</th>
+                            <th>Division</th>
+                            <th>Mentor Access</th>
+                            <th>Admission Year</th>
+                            <th>Mentor</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in students %}
+                        <tr class="student-row-clickable" data-profile-url="{% url 'student_profile' row.student.id %}">
+                            <td style="text-align:center;">
+                                <input type="checkbox" name="student_ids" value="{{ row.student.id }}" class="student-checkbox" {% if not faculty_can_manage_all and not row.is_mentor_class %}disabled{% endif %}>
+                            </td>
+                            <td>{{ row.student.name }}</td>
+                            <td>{{ row.student.enrollment_no }}</td>
+                            <td>{{ row.student.branch.name }}</td>
+                            <td>{{ row.student.semester.number }}</td>
+                            <td>{{ row.student.division }}</td>
+                            <td>
+                                {% if row.is_mentor_class %}
+                                <span class="btn-view" style="background:#1d4ed8;">Mentor</span>
+                                {% else %}
+                                <span style="color:#6b7280;">Limited</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.student.admission_year|default:"—" }}</td>
+                            <td>{{ row.student.mentor_name|default:"—" }}</td>
+                            <td>
+                                {% if user.is_staff %}
+                                    <a href="{% url 'delete_student' row.student.id %}" class="btn-view" style="background:#e74c3c;">Delete</a>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </form>
+            {% else %}
+            <div style="padding: 40px; text-align: center; color: #7f8c8d;">
+                <p>No students found</p>
+            </div>
+            {% endif %}
+        </div>
+
+    <script>
+        (function() {
+            var selectAll = document.getElementById('select-all');
+            var deleteAll = document.getElementById('delete-all');
+            var checkboxes = document.querySelectorAll('.student-checkbox');
+            var clickableRows = document.querySelectorAll('.student-row-clickable');
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(function(cb) {
+                        cb.checked = selectAll.checked;
+                    });
+                });
+            }
+
+            if (deleteAll && selectAll) {
+                deleteAll.addEventListener('change', function() {
+                    if (deleteAll.checked) {
+                        selectAll.checked = true;
+                        checkboxes.forEach(function(cb) {
+                            cb.checked = true;
+                        });
+                    }
+                });
+            }
+
+            clickableRows.forEach(function(row) {
+                row.addEventListener('click', function(event) {
+                    if (event.target.closest('a, button, input, select, label, textarea')) {
+                        return;
+                    }
+                    var profileUrl = row.getAttribute('data-profile-url');
+                    if (profileUrl) {
+                        window.location.href = profileUrl;
+                    }
+                });
+            });
+        })();
+    </script>
+    </main>
+  </div>
+</body>
+</html>

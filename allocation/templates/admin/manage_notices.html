@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Notices</title>
+  {% include 'partials/sidebar_styles.html' %}
+  <style>
+    .content { flex:1; padding: 28px; }
+    .card { background:white; border:1px solid #e5e7eb; border-radius:10px; padding:16px; margin-bottom:16px; }
+    .form-group { margin-bottom:12px; }
+    label { display:block; margin-bottom:6px; font-weight:600; color:#111827; }
+    input[type="text"], textarea, select { width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; }
+    .btn { padding:10px 14px; background: var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; }
+    .btn:hover { background: var(--primary-2); }
+    .message { background:#ecfdf3; border:1px solid #86efac; padding:10px; border-radius:6px; margin-bottom:12px; }
+    .meta { color:#6b7280; font-size:12px; margin-top:6px; }
+    .tag { display:inline-block; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+    .tag-notice { background:#e0ecff; color:#1d4ed8; }
+    .tag-result { background:#ede9fe; color:#6d28d9; }
+    .draft { color:#b45309; font-weight:600; }
+    .status-row { display:flex; gap:12px; flex-wrap:wrap; margin-top: 10px; color:#374151; font-size:14px; }
+    .pill { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700; }
+    .pill-ok { background:#dcfce7; color:#166534; }
+    .pill-warn { background:#fee2e2; color:#991b1b; }
+    .btn-danger { background:#b91c1c; }
+    .btn-danger:hover { background:#991b1b; }
+    .btn-sm { padding:6px 10px; font-size:12px; }
+    .attachment-list { margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+    .attachment-item { display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; }
+    .attachment-item a { color:#1d4ed8; text-decoration:none; }
+    .attachment-item a:hover { text-decoration:underline; }
+    .item-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    {% with active_page='notices' %}
+      {% include 'partials/sidebar.html' %}
+    {% endwith %}
+    <main class="content">
+      <h1>Publish Notice / Result</h1>
+
+      {% if message %}
+        <div class="message">{{ message }}</div>
+      {% endif %}
+
+      <div class="card">
+        <h2>Push Notification Test</h2>
+        <div class="status-row">
+          <div>Configured:
+            {% if webpush_configured %}
+              <span class="pill pill-ok">Yes</span>
+            {% else %}
+              <span class="pill pill-warn">No</span>
+            {% endif %}
+          </div>
+          <div>Active devices: <strong>{{ active_subscriptions }}</strong></div>
+        </div>
+        <form method="post" style="margin-top:10px;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="send_test_push">
+          <button type="submit" class="btn">Send Test Notification</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save_notice">
+          <div class="form-group">
+            <label>Type</label>
+            {{ form.notice_type }}
+          </div>
+          <div class="form-group">
+            <label>Title</label>
+            {{ form.title }}
+          </div>
+          <div class="form-group">
+            <label>Details</label>
+            {{ form.body }}
+          </div>
+          <div class="form-group">
+            <label>{{ form.is_published }} Publish now</label>
+          </div>
+          <div class="form-group">
+            <label for="id_attachments">Attachments (documents/images)</label>
+            <input id="id_attachments" name="attachments" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" />
+          </div>
+          <button type="submit" class="btn">Save</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Recent Announcements</h2>
+        {% for item in notices %}
+          <div style="border-top:1px solid #f3f4f6; padding:12px 0;">
+            <div>
+              {% if item.notice_type == 'RESULT' %}
+                <span class="tag tag-result">Result</span>
+              {% else %}
+                <span class="tag tag-notice">Notice</span>
+              {% endif %}
+              {% if not item.is_published %}
+                <span class="draft">Draft</span>
+              {% endif %}
+            </div>
+            <div style="font-weight:700; color:#111827; margin-top:4px;">{{ item.title }}</div>
+            <div style="margin-top:6px; white-space:pre-wrap;">{{ item.body }}</div>
+            {% if item.attachments.all %}
+              <div class="attachment-list">
+                {% for attachment in item.attachments.all %}
+                  <div class="attachment-item">
+                    <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">{{ attachment.file_name }}</a>
+                    <form method="post" style="margin:0;">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="delete_attachment">
+                      <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this attachment?');">Delete File</button>
+                    </form>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <div class="meta">
+              By {{ item.created_by.get_full_name|default:item.created_by.username|default:'System' }}
+              {% if item.published_at %}
+                • Published {{ item.published_at|date:'d M Y, h:i A' }}
+              {% else %}
+                • Created {{ item.created_at|date:'d M Y, h:i A' }}
+              {% endif %}
+            </div>
+            <div class="item-actions">
+              <form method="post" style="margin:0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_notice">
+                <input type="hidden" name="notice_id" value="{{ item.id }}">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this notice and all its attachments?');">Delete Notice</button>
+              </form>
+            </div>
+          </div>
+        {% empty %}
+          <p>No notices yet.</p>
+        {% endfor %}
+      </div>
+    </main>
+  </div>
+</body>
+</html>
