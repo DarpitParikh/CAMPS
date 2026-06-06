@@ -1,18 +1,29 @@
-# ExamHall — Exam Hall Management System
+# CAMPS — Centralized Assessment Management & Placement System (CAMPS)
 
-A Django-based application for managing exam seating, allocations, attendance, results, and notices.
+Welcome to CAMPS — a Django-based application for managing exam seating, allocations, attendance, results, and notices. This README gives a quick, attractive overview to get you started.
+
+## Why CAMPS?
+
+- Centralizes exam seat allocation, attendance tracking and results.
+- Designed for universities and colleges needing reliable exam management.
 
 ## Key Features
 
 - Seating allocation and student lists
 - Notices and attachments management
-- Result entry and reports
-- Faculty and student authentication and role-specific views
+- Result entry, reports and exports
+- Faculty and student role-based access
+
+## Quick Links
+
+- [manage.py](manage.py#L1) — Django management entrypoint
+- [examhall/settings.py](examhall/settings.py#L1) — Configuration
+- `allocation/` — core app for allocation and related features
 
 ## Requirements
 
-- Python 3.8+ (use the version your environment requires)
-- See `requirements.txt` for Python package dependencies
+- Python 3.8+ (adjust to your environment)
+- See `requirements.txt` for Python dependencies
 
 ## Quick Start (development)
 
@@ -47,19 +58,19 @@ python manage.py createsuperuser
 
 ```powershell
 python manage.py runserver
-# or use included helper scripts: run_examhall.bat / run_examhall.ps1 / quickstart.bat
+# or use helper scripts: run_examhall.bat / run_examhall.ps1 / quickstart.bat
 ```
 
 ## Database
 
-This project uses SQLite by default (`db.sqlite3` is included). For production, configure `DATABASES` in [examhall/settings.py](examhall/settings.py) and migrate accordingly.
+By default this project uses SQLite (`db.sqlite3` is included). For production, update `DATABASES` in [examhall/settings.py](examhall/settings.py#L1) to your preferred engine and run migrations.
 
 ## Static & Media
 
-- Static files are served from `staticfiles/` in production when collected.
-- Uploaded files (notices attachments) are stored under `media/notice_attachments/`.
+- Static files are served from `staticfiles/` after `collectstatic`.
+- Uploaded attachments are stored in `media/notice_attachments/`.
 
-To collect static files for production:
+Collect static files for production:
 
 ```powershell
 python manage.py collectstatic --noinput
@@ -67,13 +78,13 @@ python manage.py collectstatic --noinput
 
 ## Tests
 
-Run the test suite with:
+Run the full test suite:
 
 ```powershell
 python manage.py test
 ```
 
-Or run tests for the `allocation` app specifically:
+Run tests for the `allocation` app:
 
 ```powershell
 python manage.py test allocation
@@ -81,22 +92,22 @@ python manage.py test allocation
 
 ## Deployment Notes
 
-- See `PYTHONANYWHERE_DEPLOY.md` for an example deployment guide.
-- There are helper scripts and shortcuts in the repository (`run_examhall.bat`, `run_examhall.ps1`, `quickstart.bat`) to simplify starting the app on Windows.
+- See `PYTHONANYWHERE_DEPLOY.md` for a sample deployment walkthrough.
+- Windows helper scripts: `run_examhall.bat`, `run_examhall.ps1`, `quickstart.bat`.
 
 ## Contributing
 
-Contributions are welcome. Please open issues for bugs or feature requests and send pull requests with clear descriptions and tests where appropriate.
+Contributions are welcome — open issues or send pull requests with clear descriptions and tests where appropriate. If you'd like, I can add a `CONTRIBUTING.md` with a PR checklist.
 
 ## License
 
-This project includes a `LICENSE` file. Review it for licensing details.
+See the project's `LICENSE` file for license details.
 
-## Useful Files
+## Need More?
 
-- `manage.py` — Django management entrypoint
-- `requirements.txt` — Python dependencies
-- `examhall/settings.py` — Django settings
-- `allocation/` — core app for allocation and related features
+If you want I can:
 
-If you want, I can expand any section (deployment, docs, API reference) or add a short CONTRIBUTING.md.
+- Expand deployment instructions for a specific host (e.g., Gunicorn + Nginx).
+- Add `CONTRIBUTING.md`, `CHANGELOG.md`, or app-level READMEs.
+
+Happy to adjust wording or add visuals/screenshots — tell me which sections to expand.
