@@ -1,4 +1,4 @@
-# CAMPS — Centralized Assessment Management & Placement System (CAMPS)
+# CAMPS — Campus Academic Management and Planning System (CAMPS)
 
 Welcome to CAMPS — a Django-based application for managing exam seating, allocations, attendance, results, and notices. This README gives a quick, attractive overview to get you started.
 
